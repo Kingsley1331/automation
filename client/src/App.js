@@ -1,43 +1,22 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { Routes, Route } from "react-router-dom";
+import Messager from "./components/Messager";
+import Navigation from "./components/Navigation";
 import "./App.css";
 
-function App() {
-  const [message, setMessage] = useState("");
-  const [userInput, setUserInput] = useState("");
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3001/chatbots/chat/message")
-      .then((res) => res)
-      .then(({ data }) => {
-        console.log(data);
-        return setMessage(data.message);
-      });
-  }, []);
-
-  const handleUserInput = (e) => {
-    setUserInput(e.target.value);
-  };
-
-  const sendMessage = (e) => {
-    e.preventDefault();
-    axios
-      .post("http://localhost:3001/chatbots/chat/message", { userInput })
-      .then((res) => res)
-      .then(({ data }) => {
-        console.log(data);
-        return setMessage(data.message);
-      });
-  };
-
+const App = () => {
   return (
-    <div className="App">
-      <p>{message}</p>
-      <input type="text" onChange={handleUserInput} value={userInput} />
-      <button onClick={sendMessage}>Send</button>
-    </div>
+    <Routes>
+      <Route path="/" element={<Navigation />} />
+      <Route
+        path="/chatbots/chat/message"
+        element={<Messager endpoint="/chatbots/chat/message" />}
+      />
+      <Route
+        path="/assistants/mathsTeacher/message"
+        element={<Messager endpoint="/assistants/mathsTeacher/message" />}
+      />
+    </Routes>
   );
-}
+};
 
 export default App;
