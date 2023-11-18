@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
-import Messager from "./components/Messager";
 import Navigation from "./components/Navigation";
+import MathsTeacher from "./pages/assistants/mathsTeacher";
+import Chatbot from "./pages/chatbots/chatbot";
 import "./App.css";
 
 const App = () => {
@@ -9,11 +10,11 @@ const App = () => {
       <Route path="/" element={<Navigation />} />
       <Route
         path="/chatbots/chat/message"
-        element={<Messager endpoint="/chatbots/chat/message" />}
+        element={<Chatbot endpoint="/chatbots/chat/message" />}
       />
       <Route
         path="/assistants/mathsTeacher/message"
-        element={<Messager endpoint="/assistants/mathsTeacher/message" />}
+        element={<MathsTeacher endpoint="/assistants/mathsTeacher/message" />}
       />
     </Routes>
   );
