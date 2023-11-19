@@ -5,6 +5,8 @@ import Messager from "../../components/Messager";
 function MathsTeacher({ endpoint }) {
   const [message, setMessage] = useState("");
   const [threadId, setThreadId] = useState("");
+  const [assistantId, setAssistantId] = useState("");
+  const [assistantList, setAssistantList] = useState([]);
   const [userInput, setUserInput] = useState(
     "How many faces does an icosahedron have?"
   );
@@ -15,6 +17,10 @@ function MathsTeacher({ endpoint }) {
       .then((res) => res)
       .then(({ data }) => {
         console.log("get data ==>", data);
+        setAssistantList(data.assistantList);
+        if (data.assistantList.length) {
+          setAssistantId(data.assistantList[0].id);
+        }
         return setMessage(data.message);
       });
   }, [endpoint]);
@@ -27,7 +33,7 @@ function MathsTeacher({ endpoint }) {
     e.preventDefault();
     axios
       .post(`http://localhost:3001${endpoint}`, {
-        userInput: { message: userInput, threadId },
+        userInput: { message: userInput, threadId, assistantId },
       })
       .then((res) => res)
       .then(({ data }) => {
@@ -41,12 +47,15 @@ function MathsTeacher({ endpoint }) {
   };
 
   return (
-    <Messager
-      message={message}
-      handleUserInput={handleUserInput}
-      sendMessage={sendMessage}
-      userInput={userInput}
-    />
+    <div>
+      Assistant ID: {assistantId}
+      <Messager
+        message={message}
+        handleUserInput={handleUserInput}
+        sendMessage={sendMessage}
+        userInput={userInput}
+      />
+    </div>
   );
 }
 

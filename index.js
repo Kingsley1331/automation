@@ -16,28 +16,26 @@ app.get("/", (req, res) => {
 app.get("/chatbots/chat/message", async (req, res) => {
   const message = await main();
   res.json({ message });
-  // res.json({ message: "Hello from your server!" });
-});
-
-app.get("/assistants/mathsTeacher/message", async (req, res) => {
-  const data = await mathsTeacher();
-  const { message, threadId, runId } = data || {};
-  console.log("=========================================message", message);
-  res.json({ message, threadId, runId });
-  // res.json({ message: "Hello from your server!" });
-});
-
-app.post("/assistants/mathsTeacher/message", async (req, res) => {
-  const { userInput } = req.body;
-  const data = await mathsTeacher(userInput);
-  const { message, threadId, runId } = data || {};
-  res.json({ message, threadId, runId });
 });
 
 app.post("/chatbots/chat/message", async (req, res) => {
   const { userInput } = req.body;
   const message = await main(userInput);
   res.json({ message });
+});
+
+app.get("/assistants/mathsTeacher/message", async (req, res) => {
+  const data = await mathsTeacher();
+  const { message, threadId, runId, assistantId, assistantList } = data || {};
+  console.log("=========================================data", data);
+  res.json({ message, threadId, runId, assistantId, assistantList });
+});
+
+app.post("/assistants/mathsTeacher/message", async (req, res) => {
+  const { userInput } = req.body;
+  const data = await mathsTeacher(userInput);
+  const { message, threadId, runId, assistantId, assistantList } = data || {};
+  res.json({ message, threadId, runId, assistantId, assistantList });
 });
 
 app.listen(port, () => {
