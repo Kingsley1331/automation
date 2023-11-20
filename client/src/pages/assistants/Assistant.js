@@ -1,29 +1,41 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Messager from "../../components/Messager";
+import { useParams } from "react-router-dom";
 
-function MathsTeacher({ endpoint }) {
+function Assistant({ endpoint }) {
   const [message, setMessage] = useState("");
   const [threadId, setThreadId] = useState("");
   const [assistantId, setAssistantId] = useState("");
-  const [assistantList, setAssistantList] = useState([]);
+  const [assistant, setAssistant] = useState("");
   const [userInput, setUserInput] = useState(
     "How many faces does an icosahedron have?"
   );
+
+  const { id } = useParams();
+  console.log("id", id);
   // what is the shape of each face?
+
   useEffect(() => {
     axios
       .get(`http://localhost:3001${endpoint}`)
       .then((res) => res)
       .then(({ data }) => {
         console.log("get data ==>", data);
-        setAssistantList(data.assistantList);
-        if (data.assistantList.length) {
-          setAssistantId(data.assistantList[0].id);
-        }
         return setMessage(data.message);
       });
   }, [endpoint]);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3001/assistant/${id}`)
+      .then((res) => res)
+      .then(({ data }) => {
+        console.log("get assistant ==>", data);
+        setAssistant(data?.assistant);
+        setAssistantId(data?.assistant?.id);
+      });
+  }, [id]);
 
   const handleUserInput = (e) => {
     setUserInput(e.target.value);
@@ -48,7 +60,7 @@ function MathsTeacher({ endpoint }) {
 
   return (
     <div>
-      Assistant ID: {assistantId}
+      Assistant Name: {assistant.name}
       <Messager
         message={message}
         handleUserInput={handleUserInput}
@@ -59,4 +71,4 @@ function MathsTeacher({ endpoint }) {
   );
 }
 
-export default MathsTeacher;
+export default Assistant;

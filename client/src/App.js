@@ -1,8 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import Navigation from "./components/Navigation";
-import MathsTeacher from "./pages/assistants/mathsTeacher";
-import Chatbot from "./pages/chatbots/chatbot";
+import MathsTeacher from "./pages/assistants/AssistantsPage";
+import Chatbot from "./pages/chatbots/Chatbot";
 import "./App.css";
+import Assistant from "./pages/assistants/Assistant";
 
 const App = () => {
   return (
@@ -13,8 +14,12 @@ const App = () => {
         element={<Chatbot endpoint="/chatbots/chat/message" />}
       />
       <Route
-        path="/assistants/mathsTeacher/message"
-        element={<MathsTeacher endpoint="/assistants/mathsTeacher/message" />}
+        path="/assistants/message"
+        element={<MathsTeacher endpoint="/assistants/message" />}
+      />
+      <Route
+        path="/assistant/:id"
+        element={<Assistant endpoint="/assistants/message" />}
       />
     </Routes>
   );

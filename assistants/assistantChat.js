@@ -1,9 +1,11 @@
 import OpenAI from "openai";
+import "dotenv/config";
 
 // Create a OpenAI connection
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
+const THREAD_ID = process.env.THREAD_ID;
+console.log("========================================THREAD_ID", THREAD_ID);
 async function startNewChat() {}
 
 async function mathsTeacher(userInput) {
@@ -17,6 +19,11 @@ async function mathsTeacher(userInput) {
   let threadId2;
   let assistant = {};
   const assistantList = (await openai.beta.assistants.list()).data;
+  //   openai.beta.assistants.retrieve();
+  //   console.log(
+  //     "========================================retrieve",
+  //     await openai.beta.assistants.retrieve(assistantId)
+  //   );
   console.log("========================================userInput", userInput);
   console.log("List of assistants", assistantList);
   // async function mathsTeacher(assistantId, threadId, userInput) {
@@ -41,11 +48,12 @@ async function mathsTeacher(userInput) {
     console.log("==============================assistant", assistant);
 
     // Create a thread
-    if (!threadId) {
+    // if (!threadId) {
+    if (!threadId && !THREAD_ID) {
       thread = await openai.beta.threads.create();
       threadId2 = thread.id;
     } else {
-      threadId2 = threadId;
+      threadId2 = THREAD_ID;
     }
 
     console.log({ userInput });

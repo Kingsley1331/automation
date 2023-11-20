@@ -12,7 +12,7 @@ const List = () => {
           <NavLink to="/chatbots/chat/message">Chatbot</NavLink>
         </li>
         <li>
-          <NavLink to="/assistants/mathsTeacher/message">Assistant</NavLink>
+          <NavLink to="/assistants/message">Assistants</NavLink>
         </li>
       </ul>
     </nav>
