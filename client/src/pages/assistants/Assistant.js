@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 function Assistant({ endpoint }) {
   const [message, setMessage] = useState("");
   const [threadId, setThreadId] = useState("");
+  const [thread, setThread] = useState([]);
   const [assistantId, setAssistantId] = useState("");
   const [assistant, setAssistant] = useState("");
   const [userInput, setUserInput] = useState(
@@ -18,13 +19,16 @@ function Assistant({ endpoint }) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001${endpoint}`)
+      .get(`http://localhost:3001${endpoint}/${id}`)
       .then((res) => res)
       .then(({ data }) => {
         console.log("get data ==>", data);
-        return setMessage(data.message);
+        if (data?.messages) {
+          setThread(data.messages?.data.reverse());
+        }
+        // return setMessage(data.message);
       });
-  }, [endpoint]);
+  }, [endpoint, id]);
 
   useEffect(() => {
     axios
@@ -49,7 +53,8 @@ function Assistant({ endpoint }) {
       })
       .then((res) => res)
       .then(({ data }) => {
-        console.log("post data ==>", data);
+        // console.log("post data ==>", data);
+        setThread(data.messages.reverse());
         if (data.threadId) {
           console.log("data.threadId", data.threadId);
           setThreadId(data.threadId);
@@ -57,7 +62,7 @@ function Assistant({ endpoint }) {
         return setMessage(data.message);
       });
   };
-
+  console.log("thread", thread);
   return (
     <div>
       Assistant Name: {assistant.name}
@@ -66,6 +71,7 @@ function Assistant({ endpoint }) {
         handleUserInput={handleUserInput}
         sendMessage={sendMessage}
         userInput={userInput}
+        thread={thread}
       />
     </div>
   );

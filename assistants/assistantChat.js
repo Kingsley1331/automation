@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import "dotenv/config";
+import getThreads from "./api/getThreads.js";
 
 // Create a OpenAI connection
 
@@ -18,6 +19,8 @@ async function mathsTeacher(userInput) {
   let thread;
   let threadId2;
   let assistant = {};
+  let messageThread;
+  let messages;
   const assistantList = (await openai.beta.assistants.list()).data;
   //   openai.beta.assistants.retrieve();
   //   console.log(
@@ -93,9 +96,12 @@ async function mathsTeacher(userInput) {
       }
 
       // Get the last assistant message from the messages array
-      const messages = await openai.beta.threads.messages.list(threadId2);
+      // messages = await openai.beta.threads.messages.list(threadId2);
+      messages = await getThreads(threadId2);
 
       // Find the last message for the current run
+      messageThread = messages.data;
+
       const lastMessageForRun = messages.data
         .filter(
           (message) => message.run_id === run.id && message.role === "assistant"
@@ -109,6 +115,7 @@ async function mathsTeacher(userInput) {
     }
 
     return {
+      messages: messageThread,
       message: lastMessage,
       threadId: threadId2,
       assistantId: assistant.id || "",
