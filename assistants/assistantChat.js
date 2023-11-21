@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import "dotenv/config";
 import getThreads from "./api/getThreads.js";
+import getAssistants from "./api/getAssistants.js";
 
 // Create a OpenAI connection
 
@@ -21,7 +22,8 @@ async function mathsTeacher(userInput) {
   let assistant = {};
   let messageThread;
   let messages;
-  const assistantList = (await openai.beta.assistants.list()).data;
+
+  const assistantList = getAssistants();
   //   openai.beta.assistants.retrieve();
   //   console.log(
   //     "========================================retrieve",

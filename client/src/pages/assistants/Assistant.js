@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import Messager from "../../components/Messager";
 import { useParams } from "react-router-dom";
+import { Context } from "../../App";
 
 function Assistant({ endpoint }) {
   const [message, setMessage] = useState("");
@@ -13,18 +14,44 @@ function Assistant({ endpoint }) {
     "How many faces does an icosahedron have?"
   );
 
+  const {
+    assistants: { assistantList },
+  } = useContext(Context);
+
   const { id } = useParams();
-  console.log("id", id);
+  console.log("assistantList", assistantList);
   // what is the shape of each face?
+
+  const convertThreadToMessages = (thread, assistants) => {
+    const messages = thread.map((message) => {
+      let name = assistants.filter((assistant) => {
+        return assistant.id === message.assistant_id;
+      })[0]?.name;
+
+      if (!name && message.role === "assistant") {
+        name = "Assistant";
+      }
+
+      return {
+        id: message.id,
+        content: message.content[0].text.value,
+        role: message.role,
+        name: name ? name : "User",
+      };
+    });
+    return messages;
+  };
+  console.log("thread", thread);
+  console.log("messages", convertThreadToMessages(thread, assistantList));
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001${endpoint}/${id}`)
+      .get(`http://localhost:3001${endpoint}`)
       .then((res) => res)
       .then(({ data }) => {
         console.log("get data ==>", data);
         if (data?.messages) {
-          setThread(data.messages?.data.reverse());
+          setThread(data.messages?.data.reverse()); // do this on the server
         }
         // return setMessage(data.message);
       });
@@ -54,7 +81,7 @@ function Assistant({ endpoint }) {
       .then((res) => res)
       .then(({ data }) => {
         // console.log("post data ==>", data);
-        setThread(data.messages.reverse());
+        setThread(data.messages.reverse()); // do this on the server
         if (data.threadId) {
           console.log("data.threadId", data.threadId);
           setThreadId(data.threadId);
@@ -62,7 +89,7 @@ function Assistant({ endpoint }) {
         return setMessage(data.message);
       });
   };
-  console.log("thread", thread);
+
   return (
     <div>
       Assistant Name: {assistant.name}
@@ -71,7 +98,7 @@ function Assistant({ endpoint }) {
         handleUserInput={handleUserInput}
         sendMessage={sendMessage}
         userInput={userInput}
-        thread={thread}
+        messages={convertThreadToMessages(thread, assistantList)}
       />
     </div>
   );

@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 import Navigation from "../../components/Navigation";
+import { useContext } from "react";
+import { Context } from "../../App";
 
 function MathsTeacher() {
-  const [assistantIds, setAssistantIds] = useState([]); // [1, 2, 3, 4, 5]
+  const {
+    assistants: { assistantList, setAssistantList },
+  } = useContext(Context);
+
+  // const [assistantIds, setAssistantIds] = useState([]); // [1, 2, 3, 4, 5]
 
   useEffect(() => {
     axios
@@ -12,15 +18,15 @@ function MathsTeacher() {
       .then((res) => res)
       .then(({ data }) => {
         console.log("get Assistant IDs ==>", data);
-        return setAssistantIds(data.assistantIds);
+        return setAssistantList(data.assistantIds);
       });
-  }, []);
+  }, [setAssistantList]);
 
-  console.log("assistantIds", assistantIds);
+  console.log("assistantList", assistantList);
   return (
     <div>
       <Navigation />
-      {assistantIds.map((assist) => {
+      {assistantList.map((assist) => {
         return (
           <ul key={assist.id}>
             <li>

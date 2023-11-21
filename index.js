@@ -30,8 +30,7 @@ app.post("/chatbots/chat/message", async (req, res) => {
   res.json({ message });
 });
 
-app.get("/assistants/message/:id", async (req, res) => {
-  const { id } = req.params;
+app.get("/assistants/message", async (req, res) => {
   // const data = await assistantChat();
   const messages = await getThreads(THREAD_ID);
   // const { message, threadId, runId, assistantId, assistantList, messages } =

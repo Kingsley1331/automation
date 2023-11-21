@@ -7,7 +7,7 @@ function Messager({
   handleUserInput,
   sendMessage,
   userInput,
-  thread,
+  messages,
 }) {
   return (
     <>
@@ -16,11 +16,11 @@ function Messager({
         <p>
           <strong>ChatGPT</strong>: {message}
         </p>
-        {thread?.length &&
-          thread.map((message) => {
+        {messages?.length &&
+          messages.map((message) => {
             return (
               <p key={message.id}>
-                <strong>{message.role}</strong>: {message.content[0].text.value}
+                <strong>{message.name}</strong>: {message.content}
               </p>
             );
           })}
