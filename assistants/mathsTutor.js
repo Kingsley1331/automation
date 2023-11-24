@@ -9,9 +9,7 @@ const readline = readlineModule.createInterface({
 
 // Create a OpenAI connection
 
-
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 
 async function askQuestion(question) {
   return new Promise((resolve, reject) => {
@@ -20,7 +18,6 @@ async function askQuestion(question) {
     });
   });
 }
-
 
 // const file = await openai.files.create({
 //   file: fs.createReadStream("mydata.csv"),
@@ -35,7 +32,7 @@ async function main() {
         "You are a personal math tutor. Write and run code to answer math questions.",
       tools: [{ type: "code_interpreter" }],
       model: "gpt-4-1106-preview",
-    //   file_ids: [file.id]
+      //   file_ids: [file.id]
     });
 
     // Log the first greeting
@@ -51,7 +48,7 @@ async function main() {
     while (keepAsking) {
       const userQuestion = await askQuestion("\nWhat is your question? ");
 
-      console.log({userQuestion})
+      console.log({ userQuestion });
 
       // Pass in the user question into the existing thread
       await openai.beta.threads.messages.create(thread.id, {

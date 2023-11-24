@@ -8,10 +8,12 @@ function Messager({
   sendMessage,
   userInput,
   messages,
+  name,
 }) {
   return (
     <>
       <Navigation />
+      Assistant Name: {name}
       <div className="chatBox">
         <p>
           <strong>ChatGPT</strong>: {message}

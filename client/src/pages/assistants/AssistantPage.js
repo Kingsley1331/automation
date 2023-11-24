@@ -8,18 +8,16 @@ function Assistant({ endpoint }) {
   const [message, setMessage] = useState("");
   const [threadId, setThreadId] = useState("");
   const [thread, setThread] = useState([]);
-  const [assistantId, setAssistantId] = useState("");
   const [assistant, setAssistant] = useState("");
+  const [assistantList, setAssistantList] = useState("");
   const [userInput, setUserInput] = useState(
-    "How many faces does an icosahedron have?"
+    "How many vertices does an icosahedron have?"
   );
 
-  const {
-    assistants: { assistantList },
-  } = useContext(Context);
+  const { assistants } = useContext(Context);
 
-  const { id } = useParams();
-  console.log("assistantList", assistantList);
+  const { assistantId } = useParams();
+  console.log("assistantList", assistants.assistantList);
   // what is the shape of each face?
 
   const convertThreadToMessages = (thread, assistants) => {
@@ -41,8 +39,6 @@ function Assistant({ endpoint }) {
     });
     return messages;
   };
-  console.log("thread", thread);
-  console.log("messages", convertThreadToMessages(thread, assistantList));
 
   useEffect(() => {
     axios
@@ -51,22 +47,27 @@ function Assistant({ endpoint }) {
       .then(({ data }) => {
         console.log("get data ==>", data);
         if (data?.messages) {
-          setThread(data.messages?.data.reverse()); // do this on the server
+          setThread(data.messages?.data?.reverse()); // do this on the server
+        }
+        if (assistants.assistantList.length) {
+          setAssistantList(assistants.assistantList);
+        } else {
+          setAssistantList(data?.assistantList);
         }
         // return setMessage(data.message);
       });
-  }, [endpoint, id]);
+  }, [assistants.assistantList, endpoint]);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/assistant/${id}`)
+      .get(`http://localhost:3001/assistant/${assistantId}`)
       .then((res) => res)
       .then(({ data }) => {
         console.log("get assistant ==>", data);
         setAssistant(data?.assistant);
-        setAssistantId(data?.assistant?.id);
+        // setAssistantId(data?.assistant?.id);
       });
-  }, [id]);
+  }, [assistantId]);
 
   const handleUserInput = (e) => {
     setUserInput(e.target.value);
@@ -77,11 +78,12 @@ function Assistant({ endpoint }) {
     axios
       .post(`http://localhost:3001${endpoint}`, {
         userInput: { message: userInput, threadId, assistantId },
+        // userInput: { message: userInput, threadId, assistantId },
       })
       .then((res) => res)
       .then(({ data }) => {
         // console.log("post data ==>", data);
-        setThread(data.messages.reverse()); // do this on the server
+        setThread(data?.messages?.reverse()); // do this on the server
         if (data.threadId) {
           console.log("data.threadId", data.threadId);
           setThreadId(data.threadId);
@@ -92,9 +94,9 @@ function Assistant({ endpoint }) {
 
   return (
     <div>
-      Assistant Name: {assistant.name}
       <Messager
         message={message}
+        name={assistant.name}
         handleUserInput={handleUserInput}
         sendMessage={sendMessage}
         userInput={userInput}

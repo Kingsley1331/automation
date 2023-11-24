@@ -4,7 +4,7 @@ import Navigation from "./components/Navigation";
 import MathsTeacher from "./pages/assistants/AssistantsPage";
 import Chatbot from "./pages/chatbots/Chatbot";
 import "./App.css";
-import Assistant from "./pages/assistants/Assistant";
+import Assistant from "./pages/assistants/AssistantPage";
 
 export const Context = createContext(null);
 
@@ -25,7 +25,7 @@ const App = () => {
           element={<MathsTeacher endpoint="/assistants/message" />}
         />
         <Route
-          path="/assistant/:id"
+          path="/assistant/:assistantId"
           element={<Assistant endpoint="/assistants/message" />}
         />
       </Routes>
