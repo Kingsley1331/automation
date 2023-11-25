@@ -1,0 +1,22 @@
+.threads {
+  position: absolute;
+  left: 0;
+}
+
+.messages-threads {
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+}
+
+.message-thread {
+  width: 200px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button {
+  height: 20px;
+}

@@ -1,0 +1,7 @@
+[
+  { "id": "assistant_1", "threads": ["thread_1", "thread_2", "thread_3"] },
+  { "id": "assistant_2", "threads": ["thread_4", "thread_5", "thread_6"] },
+  { "id": "assistant_3", "threads": ["thread_7", "thread_8", "thread_9"] },
+  { "id": "assistant_4", "threads": ["thread_10", "thread_11", "thread_12"] },
+  { "id": "assistant_5", "threads": ["thread_13", "thread_14", "thread_15"] }
+]

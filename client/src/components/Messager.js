@@ -11,8 +11,7 @@ function Messager({
   name,
 }) {
   return (
-    <>
-      <Navigation />
+    <div>
       Assistant Name: {name}
       <div className="chatBox">
         <p>
@@ -36,7 +35,7 @@ function Messager({
           <button onClick={sendMessage}>Send</button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

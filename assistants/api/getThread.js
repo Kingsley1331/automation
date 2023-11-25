@@ -3,9 +3,9 @@ import "dotenv/config";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-async function getThreads(threadId) {
+async function getThread(threadId) {
   const messages = await openai.beta.threads.messages.list(threadId);
   return messages;
 }
 
-export default getThreads;
+export default getThread;

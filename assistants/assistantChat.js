@@ -1,24 +1,14 @@
 import OpenAI from "openai";
 import "dotenv/config";
-import getThreads from "./api/getThreads.js";
+import getThread from "./api/getThread.js";
 import getAssistants from "./api/getAssistants.js";
 
 // Create a OpenAI connection
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const THREAD_ID = process.env.THREAD_ID;
-// console.log("========================================THREAD_ID", THREAD_ID);
-async function startNewChat() {}
 
-async function mathsTeacher(userInput) {
-  const {
-    threadId,
-    runId,
-    message: userMessage,
-    assistantId,
-  } = userInput || {};
-  let thread;
-  let threadId2;
+async function mathsTeacher(userInput, threadId) {
+  const { runId, message: userMessage, assistantId } = userInput || {};
   let assistant = {};
   let messageThread;
   let messages;
@@ -56,23 +46,23 @@ async function mathsTeacher(userInput) {
 
     // Create a thread
     // if (!threadId) {
-    if (!threadId && !THREAD_ID) {
-      thread = await openai.beta.threads.create();
-      threadId2 = thread.id;
-    } else {
-      threadId2 = THREAD_ID;
-    }
+    // if (!threadId && !THREAD_ID) {
+    //   thread = await openai.beta.threads.create();
+    //   threadId2 = thread.id;
+    // } else {
+    //   threadId2 = THREAD_ID;
+    // }
 
     // console.log({ userInput });
 
     // Pass in the user question into the existing thread
     if (userInput) {
-      await openai.beta.threads.messages.create(threadId2, {
+      await openai.beta.threads.messages.create(threadId, {
         role: "user",
         content: userMessage,
       });
     } else {
-      await openai.beta.threads.messages.create(threadId2, {
+      await openai.beta.threads.messages.create(threadId, {
         role: "user",
         content:
           "Hello there, I'm your personal math tutor. Ask some complicated questions.",
@@ -83,25 +73,22 @@ async function mathsTeacher(userInput) {
     //=================================================================================================
     let lastMessage = "";
     if (assistant.id) {
-      const run = await openai.beta.threads.runs.create(threadId2, {
+      const run = await openai.beta.threads.runs.create(threadId, {
         assistant_id: assistant.id,
       });
 
-      let runStatus = await openai.beta.threads.runs.retrieve(
-        threadId2,
-        run.id
-      );
+      let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
 
       // Polling mechanism to see if runStatus is completed
       // This should be made more robust. eg should have error handling, also need to exit loop if it takes too long
       while (runStatus.status !== "completed") {
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        runStatus = await openai.beta.threads.runs.retrieve(threadId2, run.id);
+        runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
       }
 
       // Get the last assistant message from the messages array
       // messages = await openai.beta.threads.messages.list(threadId2);
-      messages = await getThreads(threadId2);
+      messages = await getThread(threadId);
 
       // Find the last message for the current run
       messageThread = messages.data;
@@ -121,7 +108,7 @@ async function mathsTeacher(userInput) {
     return {
       messages: messageThread,
       message: lastMessage,
-      threadId: threadId2,
+      threadId: threadId,
       assistantId: assistant.id || "",
       assistantList,
       runId: "",
