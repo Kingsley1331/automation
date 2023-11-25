@@ -1,9 +1,13 @@
 import OpenAI from "openai";
+import "dotenv/config";
+import getThreads from "./api/getThreads.js";
+import getAssistants from "./api/getAssistants.js";
 
 // Create a OpenAI connection
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
+const THREAD_ID = process.env.THREAD_ID;
+// console.log("========================================THREAD_ID", THREAD_ID);
 async function startNewChat() {}
 
 async function mathsTeacher(userInput) {
@@ -16,14 +20,24 @@ async function mathsTeacher(userInput) {
   let thread;
   let threadId2;
   let assistant = {};
-  const assistantList = (await openai.beta.assistants.list()).data;
-  console.log("========================================userInput", userInput);
-  console.log("List of assistants", assistantList);
+  let messageThread;
+  let messages;
+
+  const assistantList = await getAssistants();
+  //   openai.beta.assistants.retrieve();
+  //   console.log(
+  //     "========================================retrieve",
+  //     await openai.beta.assistants.retrieve(assistantId)
+  //   );
+  // console.log("========================================userInput", userInput);
+  // console.log("List of assistants", assistantList);
   // async function mathsTeacher(assistantId, threadId, userInput) {
   try {
+    console.log("assistantList.length ==>", assistantList.length);
+    console.log("assistantList ==>", assistantList);
     if (!assistantList.length) {
       assistant = await openai.beta.assistants.create({
-        name: "Math Tutor",
+        name: "Math Tutor2",
         instructions:
           "You are a personal math tutor. Write and run code to answer math questions.",
         tools: [{ type: "code_interpreter" }],
@@ -38,17 +52,18 @@ async function mathsTeacher(userInput) {
       }
     }
 
-    console.log("==============================assistant", assistant);
+    // console.log("==============================assistant", assistant);
 
     // Create a thread
-    if (!threadId) {
+    // if (!threadId) {
+    if (!threadId && !THREAD_ID) {
       thread = await openai.beta.threads.create();
       threadId2 = thread.id;
     } else {
-      threadId2 = threadId;
+      threadId2 = THREAD_ID;
     }
 
-    console.log({ userInput });
+    // console.log({ userInput });
 
     // Pass in the user question into the existing thread
     if (userInput) {
@@ -85,9 +100,12 @@ async function mathsTeacher(userInput) {
       }
 
       // Get the last assistant message from the messages array
-      const messages = await openai.beta.threads.messages.list(threadId2);
+      // messages = await openai.beta.threads.messages.list(threadId2);
+      messages = await getThreads(threadId2);
 
       // Find the last message for the current run
+      messageThread = messages.data;
+
       const lastMessageForRun = messages.data
         .filter(
           (message) => message.run_id === run.id && message.role === "assistant"
@@ -97,10 +115,11 @@ async function mathsTeacher(userInput) {
       // If an assistant message is found, console.log() it
       // if (lastMessageForRun) {
       lastMessage = lastMessageForRun.content[0].text.value;
-      console.log(lastMessage);
+      // console.log(lastMessage);
     }
 
     return {
+      messages: messageThread,
       message: lastMessage,
       threadId: threadId2,
       assistantId: assistant.id || "",

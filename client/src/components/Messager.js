@@ -2,12 +2,30 @@ import React from "react";
 import Navigation from "./Navigation";
 import "./Messager.css";
 
-function Messager({ message, handleUserInput, sendMessage, userInput }) {
+function Messager({
+  message,
+  handleUserInput,
+  sendMessage,
+  userInput,
+  messages,
+  name,
+}) {
   return (
     <>
       <Navigation />
+      Assistant Name: {name}
       <div className="chatBox">
-        <p>ChatGPT: {message}</p>
+        <p>
+          <strong>ChatGPT</strong>: {message}
+        </p>
+        {messages?.length &&
+          messages.map((message) => {
+            return (
+              <p key={message.id}>
+                <strong>{message.name}</strong>: {message.content}
+              </p>
+            );
+          })}
         <div className="inputWrapper">
           <textarea
             type="text"

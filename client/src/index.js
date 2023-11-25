@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState, createContext } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+
+// export const Context = createContext(null);
+// const [assistantIds, setAssistantIds] = useState([]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
