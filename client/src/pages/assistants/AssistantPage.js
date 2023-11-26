@@ -15,9 +15,8 @@ function Assistant({ endpoint }) {
   const [thread, setThread] = useState([]);
   const [assistant, setAssistant] = useState("");
   const [assistantList, setAssistantList] = useState("");
-  const [userInput, setUserInput] = useState(
-    "How many vertices does an icosahedron have?"
-  );
+  const [userInput, setUserInput] = useState("");
+  const [showChatBox, setShowChatBox] = useState(false);
 
   const { assistants } = useContext(Context);
 
@@ -48,6 +47,7 @@ function Assistant({ endpoint }) {
 
   const getMessages = async (threadId) => {
     setSelectedThread(threadId);
+    setShowChatBox(true);
     axios
       .get(`http://localhost:3001${endpoint}/${threadId}`)
       .then((res) => res)
@@ -112,14 +112,14 @@ function Assistant({ endpoint }) {
         return setMessage(data.message);
       });
   };
-
+  console.log("THREADS", threads);
   return (
     <>
       <Navigation />
       <div className="messages-wrapper">
         <div className="messages-container">
           <Threads threads={threads} getMessages={getMessages} />
-          {threads.length && (
+          {threads.length && showChatBox && (
             <Messager
               message={message}
               name={assistant.name}

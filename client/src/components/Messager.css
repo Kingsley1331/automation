@@ -4,6 +4,7 @@
   border: 1px solid #ccc;
   /* text-align: center; */
   padding-left: 50px;
+  min-width: 400px;
   max-width: 600px;
   max-height: 400px;
   margin: 0 auto;
