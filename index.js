@@ -59,7 +59,6 @@ app.post("/create_chat/:assistantId", async (req, res) => {
 
 app.delete("/delete_chat/:assistantId/:threadId", async (req, res) => {
   const { assistantId, threadId } = req.params;
-  console.log({ assistantId, threadId });
   const message = await deleteThread(assistantId, threadId);
   res.json({ message });
 });
@@ -78,7 +77,6 @@ app.get("/assistant/:id", async (req, res) => {
 app.get("/threads/:assistantId", async (req, res) => {
   const { assistantId } = req.params;
   const threads = await getThreads(assistantId);
-  console.log("threads ==>", threads);
   res.json({ threads });
 });
 
