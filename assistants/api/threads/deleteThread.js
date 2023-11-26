@@ -34,24 +34,3 @@ const deleteThread = async (assistantId, threadId) => {
 };
 
 export default deleteThread;
-// database/assistants.json
-// [
-//   {
-//     assistantId: "asst_nsN6ZIzVHRtkL89Lwyg1deO4",
-//     threadIds: [
-//       "thread_a6SlWfJ9gnItdxibdfpTYyoL",
-//       "thread_mIxTuiTzK2Y1NkDMrmPpI13l",
-//     ],
-//   },
-//   {
-//     assistantId: "asst_jQN8jrgUQlSpotKHuHoGbBNH",
-//     threadIds: [
-//       "thread_pezwGJ8s8z2AXEeX1HUscwIE",
-//       "thread_hxuh6xDJIvDvdGToiBrD5tzh",
-//     ],
-//   },
-//   {
-//     assistantId: "asst_Hvvslw02GyI1r8kFQRRVSKPe",
-//     threadIds: ["thread_qNjBZTcVIHCpqYI3fXEriFwI"],
-//   },
-// ];
