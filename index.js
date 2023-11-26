@@ -9,6 +9,7 @@ import getAssistants from "./assistants/api/getAssistants.js";
 import getThread from "./assistants/api/getThread.js";
 import getThreads from "./assistants/api/threads/getThreads.js";
 import createThread from "./assistants/api/threads/createThread.js";
+import deleteThread from "./assistants/api/threads/deleteThread.js";
 
 const app = express();
 const port = 3001;
@@ -56,6 +57,13 @@ app.post("/create_chat/:assistantId", async (req, res) => {
   res.json({ message });
 });
 
+app.delete("/delete_chat/:assistantId/:threadId", async (req, res) => {
+  const { assistantId, threadId } = req.params;
+  console.log({ assistantId, threadId });
+  const message = await deleteThread(assistantId, threadId);
+  res.json({ message });
+});
+
 app.get("/assistants", async (req, res) => {
   const assistantIds = await getAssistantIds();
   res.json({ assistantIds });
@@ -77,16 +85,3 @@ app.get("/threads/:assistantId", async (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
-
-// fs.writeFileSync("assistants.json", JSON.stringify(assistants));
-
-// const file = fs.readFileSync("assistants.json", "utf8");
-
-// console.log(file);
-
-// fs.appendFile("demo.txt", "This is an update", function (err) {
-//   if (err) {
-//     throw err;
-//   }
-//   console.log("Updated!");
-// });

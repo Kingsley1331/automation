@@ -1,28 +1,9 @@
 import OpenAI from "openai";
 import fs from "fs";
 import "dotenv/config";
+import { getAssistant, getOtherAssistants } from "./utility.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-const getAssistant = (assistant_Id) => {
-  const file = JSON.parse(fs.readFileSync("database/assistants.json", "utf8"));
-
-  const assistant = file.filter(
-    ({ assistantId }) => assistantId === assistant_Id
-  )[0];
-
-  return assistant;
-};
-
-const getOtherAssistants = (assistant_Id) => {
-  const file = JSON.parse(fs.readFileSync("database/assistants.json", "utf8"));
-
-  const assistants = file.filter(
-    ({ assistantId }) => assistantId !== assistant_Id
-  );
-
-  return assistants;
-};
 
 const addThreadToAssistant = (assistant_Id, threadId) => {
   const assistant = getAssistant(assistant_Id);
@@ -48,11 +29,8 @@ const createThread = async (assistantId) => {
   console.log("assistantId ==>", assistantId);
   console.log("thread ==>", thread);
 
-  const assistant = getAssistant(assistantId);
+  addThreadToAssistant(assistantId, thread.id);
 
-  if (assistant) {
-    addThreadToAssistant(assistantId, thread.id);
-  }
   return thread;
 };
 

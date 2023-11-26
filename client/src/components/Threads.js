@@ -16,6 +16,22 @@ function Threads({ threads, getMessages }) {
       });
   };
 
+  const deleteThread = (threadId) => {
+    const deleteThread = window.confirm(
+      "Are you sure you want to delete this thread?"
+    );
+
+    if (deleteThread) {
+      console.log("delete thread");
+      axios
+        .delete(`http://localhost:3001/delete_chat/${assistantId}/${threadId}`)
+        .then((res) => res)
+        .then(({ data }) => {
+          console.log("DELETE THREAD ==>", data);
+        });
+    }
+  };
+
   return (
     <div className="threads">
       <h1>Threads</h1>
@@ -25,6 +41,7 @@ function Threads({ threads, getMessages }) {
             <div key={thread} className="message-thread">
               <p>{thread.substr(0, 8)}</p>
               <button onClick={() => getMessages(thread)}>Resume chat</button>
+              <button onClick={() => deleteThread(thread)}>Delete chat</button>
             </div>
           ))}
         <br></br>

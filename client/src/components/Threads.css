@@ -1,6 +1,5 @@
 .threads {
-  position: absolute;
-  left: 0;
+  margin-left: 10px;
 }
 
 .messages-threads {
@@ -10,7 +9,9 @@
 }
 
 .message-thread {
-  width: 200px;
+  min-width: 300px;
+  max-width: 400px;
+  margin-right: 20px;
 
   display: flex;
   justify-content: space-between;

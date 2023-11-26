@@ -1,5 +1,4 @@
 import React from "react";
-import Navigation from "./Navigation";
 import "./Messager.css";
 
 function Messager({
@@ -14,9 +13,6 @@ function Messager({
     <div>
       Assistant Name: {name}
       <div className="chatBox">
-        <p>
-          <strong>ChatGPT</strong>: {message}
-        </p>
         {messages?.length &&
           messages.map((message) => {
             return (
