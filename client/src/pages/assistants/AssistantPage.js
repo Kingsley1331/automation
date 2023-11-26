@@ -9,7 +9,6 @@ import "./AssistantPage.css";
 
 function Assistant({ endpoint }) {
   const [message, setMessage] = useState("");
-  // const [threadId, setThreadId] = useState("");
   const [selectedThread, setSelectedThread] = useState("");
   const [threads, setThreads] = useState([]);
   const [thread, setThread] = useState([]);
@@ -21,8 +20,6 @@ function Assistant({ endpoint }) {
   const { assistants } = useContext(Context);
 
   const { assistantId } = useParams();
-  console.log("assistantList", assistants.assistantList);
-  console.log("=========================================", selectedThread);
   // what is the shape of each face?
 
   const convertThreadToMessages = (thread, assistants) => {
@@ -61,7 +58,6 @@ function Assistant({ endpoint }) {
         } else {
           setAssistantList(data?.assistantList);
         }
-        // return setMessage(data.message);
       });
   };
 
@@ -72,7 +68,6 @@ function Assistant({ endpoint }) {
       .then(({ data }) => {
         console.log("get assistant ==>", data);
         setAssistant(data?.assistant);
-        // setAssistantId(data?.assistant?.id);
       });
   }, [assistantId]);
 
@@ -81,7 +76,6 @@ function Assistant({ endpoint }) {
       const { data: threads } = res;
       if (threads) {
         setThreads(threads.threads);
-        console.log("threads", threads.threads);
       }
     });
   }, [assistantId]);
@@ -96,23 +90,16 @@ function Assistant({ endpoint }) {
       .post(`http://localhost:3001${endpoint}/${selectedThread}`, {
         userInput: {
           message: userInput,
-          // threadId: selectedThread,
           assistantId,
         },
-        // userInput: { message: userInput, threadId, assistantId },
       })
       .then((res) => res)
       .then(({ data }) => {
-        // console.log("post data ==>", data);
         setThread(data?.messages?.reverse()); // do this on the server
-        // if (data.threadId) {
-        //   console.log("data.threadId", data.threadId);
-        //   setThreadId(data.threadId);
-        // }
         return setMessage(data.message);
       });
   };
-  console.log("THREADS", threads);
+
   return (
     <>
       <Navigation />

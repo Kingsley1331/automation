@@ -13,7 +13,6 @@ const addThreadToAssistant = (assistant_Id, threadId) => {
   }
 
   assistant.threadIds.push(threadId);
-
   const assistants = getOtherAssistants(assistant_Id);
 
   if (!assistants) {
@@ -26,9 +25,6 @@ const addThreadToAssistant = (assistant_Id, threadId) => {
 
 const createThread = async (assistantId) => {
   const thread = await openai.beta.threads.create();
-  console.log("assistantId ==>", assistantId);
-  console.log("thread ==>", thread);
-
   addThreadToAssistant(assistantId, thread.id);
 
   return thread;

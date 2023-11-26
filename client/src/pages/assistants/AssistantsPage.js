@@ -22,7 +22,6 @@ function MathsTeacher() {
       });
   }, [setAssistantList]);
 
-  console.log("assistantList", assistantList);
   return (
     <div>
       <Navigation />
