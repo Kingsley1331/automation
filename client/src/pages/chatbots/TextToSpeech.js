@@ -4,6 +4,7 @@ import Navigation from "../../components/Navigation";
 
 function Chatbot({ endpoint }) {
   const [messages, setMessages] = useState("");
+  const [audio, setAudio] = useState();
   const [userInput, setUserInput] = useState(
     "How many faces does an icosahedron have?"
   );
@@ -18,6 +19,17 @@ function Chatbot({ endpoint }) {
       });
   }, [endpoint]);
 
+  // useEffect(() => {
+  //   axios
+  //     .get(`http://localhost:3001/speech`)
+  //     .then((res) => res)
+  //     .then(({ data }) => {
+  //       console.log("get sound data ==>", typeof data);
+  //       const blob = new Blob([data], { type: "audio/mp3" });
+  //       return setAudio(blob);
+  //     });
+  // }, []);
+
   const handleUserInput = (e) => {
     setUserInput(e.target.value);
   };
@@ -31,10 +43,33 @@ function Chatbot({ endpoint }) {
       .then((res) => res)
       .then(({ data }) => {
         console.log("post data ==>", data);
+        playAudio();
         return setMessages(data.messages);
       });
   };
   console.log("messages", messages);
+
+  const playAudio = async () => {
+    const { data } = await axios.get("http://localhost:3001/speech", {
+      responseType: "arraybuffer",
+      headers: {
+        "Content-Type": "audio/mp3",
+      },
+    });
+    const blob = new Blob([data], {
+      type: "audio/mp3",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    setAudio(audio);
+    audio.play();
+  };
+
+  // useEffect(() => {
+  //   playAudio();
+  // }, []);
+
   return (
     <>
       <Navigation />
@@ -56,6 +91,7 @@ function Chatbot({ endpoint }) {
               placeholder="Ask me anything"
             />
             <button onClick={sendMessage}>Send</button>
+            <button onClick={playAudio}>replay</button>
           </div>
         </div>
       </div>
