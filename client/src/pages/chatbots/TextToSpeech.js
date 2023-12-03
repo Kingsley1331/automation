@@ -3,8 +3,10 @@ import axios from "axios";
 import Navigation from "../../components/Navigation";
 
 function Chatbot({ endpoint }) {
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [recorder, setRecorder] = useState(null);
   const [messages, setMessages] = useState("");
-  const [audio, setAudio] = useState();
+  const [disableRecord, setDisableRecord] = useState(false);
   const [userInput, setUserInput] = useState(
     "How many faces does an icosahedron have?"
   );
@@ -15,6 +17,7 @@ function Chatbot({ endpoint }) {
       .then((res) => res)
       .then(({ data }) => {
         console.log("get data ==>", data);
+        // playAudio(); visit: https://developer.chrome.com/blog/autoplay/
         return setMessages(data.messages);
       });
   }, [endpoint]);
@@ -62,13 +65,37 @@ function Chatbot({ endpoint }) {
 
     const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
-    setAudio(audio);
     audio.play();
   };
 
-  // useEffect(() => {
-  //   playAudio();
-  // }, []);
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const newRecorder = new MediaRecorder(stream);
+    newRecorder.ondataavailable = (e) => {
+      setAudioBlob(e.data);
+      console.log("audioBlob", e.data);
+    };
+    newRecorder.start();
+    setRecorder(newRecorder);
+  };
+
+  const stopRecording = () => {
+    recorder.stop();
+  };
+
+  const sendAudio = () => {
+    const formData = new FormData();
+    formData.append("audio", audioBlob, "audioFileName.mp3");
+    console.log("formData", formData);
+    fetch("http://localhost:3001/speech", {
+      method: "POST",
+      body: formData,
+    });
+    /**If you want play the recorded sound */
+    const url = URL.createObjectURL(audioBlob);
+    const audio = new Audio(url);
+    audio.play();
+  };
 
   return (
     <>
@@ -91,7 +118,12 @@ function Chatbot({ endpoint }) {
               placeholder="Ask me anything"
             />
             <button onClick={sendMessage}>Send</button>
-            <button onClick={playAudio}>replay</button>
+            <button onClick={playAudio}>Replay</button>
+          </div>
+          <div>
+            <button onClick={startRecording}>Start Recording</button>
+            <button onClick={stopRecording}>Stop Recording</button>
+            <button onClick={sendAudio}>Send Audio</button>
           </div>
         </div>
       </div>
