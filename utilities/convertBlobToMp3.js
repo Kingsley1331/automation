@@ -1,12 +1,14 @@
 import ffmpeg from "fluent-ffmpeg";
 import ffmpegStatic from "ffmpeg-static";
-// import fs from "fs";
-// import path from "path";
+import fs from "fs";
+import path from "path";
 
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
+const isDirectory = (source) => fs.lstatSync(source).isDirectory();
+
 const convertBlobToMp3 = (req, res) => {
-  //  const directory = path.resolve("./uploads/audioFiles");
+  const directory = "uploads/";
   const audioPath = req.file.path;
   const outputPath = "uploads/audioFiles/output.mp3";
   // ffmpeg converts audio blob to mp3
@@ -15,6 +17,20 @@ const convertBlobToMp3 = (req, res) => {
     .on("end", () => {
       console.log("Conversion finished.");
       res.send("File converted to MP3 successfully.");
+
+      fs.readdir(directory, (err, files) => {
+        console.log("files", files);
+        if (err) {
+          throw err;
+        }
+        for (const file of files) {
+          if (!isDirectory(path.join(directory, file))) {
+            fs.unlink(path.join(directory, file), (err) => {
+              if (err) throw err;
+            });
+          }
+        }
+      });
     })
     .on("error", (err) => {
       console.error("Error:", err);
