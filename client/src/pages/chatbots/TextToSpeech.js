@@ -76,11 +76,13 @@ function Chatbot({ endpoint }) {
       console.log("audioBlob", e.data);
     };
     newRecorder.start();
+    setDisableRecord(true);
     setRecorder(newRecorder);
   };
 
   const stopRecording = () => {
     recorder.stop();
+    setDisableRecord(false);
   };
 
   const sendAudio = () => {
@@ -92,11 +94,11 @@ function Chatbot({ endpoint }) {
       body: formData,
     });
     /**If you want play the recorded sound */
-    const url = URL.createObjectURL(audioBlob);
-    const audio = new Audio(url);
-    audio.play();
+    // const url = URL.createObjectURL(audioBlob);
+    // const audio = new Audio(url);
+    // audio.play();
   };
-
+  console.log("=========================>disableRecord", disableRecord);
   return (
     <>
       <Navigation />
@@ -121,7 +123,9 @@ function Chatbot({ endpoint }) {
             <button onClick={playAudio}>Replay</button>
           </div>
           <div>
-            <button onClick={startRecording}>Start Recording</button>
+            <button onClick={startRecording} disabled={disableRecord}>
+              Start Recording
+            </button>
             <button onClick={stopRecording}>Stop Recording</button>
             <button onClick={sendAudio}>Send Audio</button>
           </div>
