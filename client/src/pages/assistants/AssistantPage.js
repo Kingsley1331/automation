@@ -84,22 +84,6 @@ function Assistant({ endpoint }) {
     setUserInput(e.target.value);
   };
 
-  const sendMessage1 = (e) => {
-    e.preventDefault();
-    axios
-      .post(`http://localhost:3001${endpoint}/${selectedThread}`, {
-        payload: {
-          message: userInput,
-          assistantId,
-        },
-      })
-      .then((res) => res)
-      .then(({ data }) => {
-        setUserInput("");
-        setThread(data?.messages);
-      });
-  };
-
   return (
     <>
       <Navigation />
@@ -119,7 +103,6 @@ function Assistant({ endpoint }) {
                   setThread
                 );
               }}
-              // sendMessage={sendMessage1}
               userInput={userInput}
               setUserInput={setUserInput}
               messages={convertThreadToMessages(thread, assistantList)}
