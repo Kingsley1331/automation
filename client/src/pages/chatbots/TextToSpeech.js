@@ -18,6 +18,7 @@ function Chatbot({ endpoint }) {
   const [userInput, setUserInput] = useState(
     "How many faces does an icosahedron have?"
   );
+  const [recordButtonText, setRecordButtonText] = useState("Start Recording");
 
   console.log("endpoint", endpoint);
   // what is the shape of each face?
@@ -85,19 +86,16 @@ function Chatbot({ endpoint }) {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                startRecording(setAudioBlob, setDisableRecord, setRecorder);
-              }}
-              disabled={disableRecord}
-            >
-              Start Recording
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                stopRecording(recorder, setDisableRecord);
+                if (!disableRecord) {
+                  startRecording(setAudioBlob, setDisableRecord, setRecorder);
+                  setRecordButtonText("Stop Recording");
+                } else {
+                  stopRecording(recorder, setDisableRecord);
+                  setRecordButtonText("Start Recording");
+                }
               }}
             >
-              Stop Recording
+              {recordButtonText}
             </button>
           </div>
         </div>
