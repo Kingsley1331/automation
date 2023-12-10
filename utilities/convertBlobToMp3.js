@@ -2,6 +2,7 @@ import ffmpeg from "fluent-ffmpeg";
 import ffmpegStatic from "ffmpeg-static";
 import fs from "fs";
 import path from "path";
+import speechToText from "../chatbots/speechToText.js";
 
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
@@ -14,9 +15,11 @@ const convertBlobToMp3 = (req, res) => {
   // ffmpeg converts audio blob to mp3
   ffmpeg(audioPath)
     .toFormat("mp3")
-    .on("end", () => {
+    .on("end", async () => {
       console.log("Conversion finished.");
-      res.send("File converted to MP3 successfully.");
+      // res.send("File converted to MP3 successfully.");
+      const textFromAudio = await speechToText();
+      res.json({ textFromAudio });
 
       fs.readdir(directory, (err, files) => {
         console.log("files", files);

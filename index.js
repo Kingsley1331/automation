@@ -45,20 +45,25 @@ app.get("/text-to-speech/message", async (req, res) => {
 });
 
 app.post("/text-to-speech/message", async (req, res) => {
-  const { userInput } = req.body;
-  const messages = await textToSpeech(userInput);
-  const text = await speechToText();
-  res.json({ messages, text });
+  const { payload } = req.body;
+  const messages = await textToSpeech(payload);
+  console.log("========messages", messages);
+  res.json({ messages });
 });
 
 app.get("/speech", (req, res) => {
   streamAudioToClient(req, res, "speech/speech.mp3");
 });
 
-app.post("/speech", upload.single("audio"), (req, res) => {
+app.post("/speech", upload.single("audio"), async (req, res) => {
   convertBlobToMp3(req, res);
 });
 
+app.get("/text-from-audio", async (req, res) => {
+  const textFromAudio = await speechToText();
+  console.log("===================>textFromAudio", textFromAudio);
+  res.json({ textFromAudio });
+});
 /*****************************************************************************************************************/
 app.get("/assistants/message/:threadId", async (req, res) => {
   const { threadId } = req.params;

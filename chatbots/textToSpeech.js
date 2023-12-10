@@ -17,12 +17,15 @@ async function main(message) {
   await fs.promises.writeFile(speechFile, buffer);
 }
 
-async function speaker(userInput) {
-  const messages = [
-    { role: "system", content: "You are a helpful assistant." },
-  ];
-  if (userInput) {
-    messages.push({ role: "user", content: userInput });
+async function speaker(payload) {
+  console.log("payload ==>", payload);
+  let messages;
+  if (!payload) {
+    messages = [{ role: "system", content: "You are a helpful assistant." }];
+  }
+
+  if (payload) {
+    messages = [...payload];
   }
 
   const completion = await openai.chat.completions.create({
@@ -37,7 +40,7 @@ async function speaker(userInput) {
   const message = completion.choices[0]?.message?.content;
   console.log("message", message);
   await main(message);
-  return completion.choices;
+  return [...messages, ...completion.choices.map((choice) => choice.message)];
 }
 
 export default speaker;
