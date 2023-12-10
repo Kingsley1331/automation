@@ -32,6 +32,13 @@ function Chatbot({ endpoint }) {
       });
   }, [endpoint]);
 
+  useEffect(() => {
+    if (audioBlob) {
+      sendAudio(audioBlob, setUserInput);
+      getTextFromAudio(setUserInput);
+    }
+  }, [audioBlob]);
+
   const handleUserInput = (e) => {
     setUserInput(e.target.value);
   };
@@ -91,15 +98,6 @@ function Chatbot({ endpoint }) {
               }}
             >
               Stop Recording
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                sendAudio(audioBlob, setUserInput);
-                getTextFromAudio(setUserInput);
-              }}
-            >
-              Send Audio
             </button>
           </div>
         </div>
