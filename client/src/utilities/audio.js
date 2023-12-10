@@ -1,13 +1,12 @@
 import axios from "axios";
 
 export const sendMessage = (
-  userInput,
+  payload,
   setUserInput,
   apiEndpoint,
-  messages,
   setMessages
 ) => {
-  const payload = [...messages, { role: "user", content: userInput }];
+  // const payload = [...messages, { role: "user", content: userInput }];
   axios
     .post(apiEndpoint, {
       payload,

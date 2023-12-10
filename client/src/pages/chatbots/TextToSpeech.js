@@ -15,9 +15,7 @@ function Chatbot({ endpoint }) {
   const [recorder, setRecorder] = useState(null);
   const [messages, setMessages] = useState("");
   const [disableRecord, setDisableRecord] = useState(false);
-  const [userInput, setUserInput] = useState(
-    "How many faces does an icosahedron have?"
-  );
+  const [userInput, setUserInput] = useState("");
   const [recordButtonText, setRecordButtonText] = useState("Start Recording");
 
   console.log("endpoint", endpoint);
@@ -28,7 +26,7 @@ function Chatbot({ endpoint }) {
       .then((res) => res)
       .then(({ data }) => {
         console.log("get data ==>", data);
-        // playAudio(); visit: https://developer.chrome.com/blog/autoplay/
+        // playAudio(); //visit: https://developer.chrome.com/blog/autoplay/
         return setMessages(data.messages);
       });
   }, [endpoint]);
@@ -45,6 +43,7 @@ function Chatbot({ endpoint }) {
   };
 
   console.log("messages", messages);
+  console.log("userInput", userInput);
 
   return (
     <>
@@ -55,7 +54,8 @@ function Chatbot({ endpoint }) {
             messages.map((message) => {
               return (
                 <p key={message.id}>
-                  <strong>{message.role}</strong> {message.content}
+                  <strong>{message.name || message.role}</strong>{" "}
+                  {message.content}
                 </p>
               );
             })}
@@ -70,10 +70,9 @@ function Chatbot({ endpoint }) {
               onClick={(e) => {
                 e.preventDefault();
                 sendMessage(
-                  userInput,
+                  [...messages, { role: "user", content: userInput }],
                   setUserInput,
                   `http://localhost:3001${endpoint}`,
-                  messages,
                   setMessages
                 );
               }}

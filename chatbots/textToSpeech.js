@@ -1,21 +1,7 @@
 import OpenAI from "openai";
-import fs from "fs";
-import path from "path";
+import convertTextToMp3 from "../utilities/convertTextToMp3.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-const speechFile = path.resolve("./speech/speech.mp3");
-
-async function main(message) {
-  const mp3 = await openai.audio.speech.create({
-    model: "tts-1",
-    voice: "alloy",
-    input: message,
-  });
-  console.log(speechFile);
-  const buffer = Buffer.from(await mp3.arrayBuffer());
-  await fs.promises.writeFile(speechFile, buffer);
-}
 
 async function speaker(payload) {
   console.log("payload ==>", payload);
@@ -39,7 +25,7 @@ async function speaker(payload) {
   console.log("choices", completion.choices);
   const message = completion.choices[0]?.message?.content;
   console.log("message", message);
-  await main(message);
+  await convertTextToMp3(message);
   return [...messages, ...completion.choices.map((choice) => choice.message)];
 }
 

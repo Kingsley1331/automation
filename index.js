@@ -78,9 +78,10 @@ app.get("/assistants/message/:threadId", async (req, res) => {
 /** Is this still needed? */
 app.post("/assistants/message/:threadId", async (req, res) => {
   const { threadId } = req.params;
-  const { userInput } = req.body;
-  const data = await assistantChat(userInput, threadId);
-  const { message, runId, assistantId, assistantList, messages } = data || {};
+  const { payload } = req.body;
+  const data = await assistantChat(payload, threadId);
+  let { message, runId, assistantId, assistantList, messages } = data || {};
+  messages = messages.reverse();
   res.json({ message, runId, assistantId, assistantList, messages });
 });
 

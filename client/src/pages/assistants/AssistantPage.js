@@ -5,10 +5,10 @@ import { useParams } from "react-router-dom";
 import { Context } from "../../App";
 import Threads from "../../components/Threads";
 import Navigation from "../../components/Navigation";
+import { sendMessage } from "../../utilities/audio";
 import "./AssistantPage.css";
 
 function Assistant({ endpoint }) {
-  const [message, setMessage] = useState("");
   const [selectedThread, setSelectedThread] = useState("");
   const [threads, setThreads] = useState([]);
   const [thread, setThread] = useState([]);
@@ -84,19 +84,19 @@ function Assistant({ endpoint }) {
     setUserInput(e.target.value);
   };
 
-  const sendMessage = (e) => {
+  const sendMessage1 = (e) => {
     e.preventDefault();
     axios
       .post(`http://localhost:3001${endpoint}/${selectedThread}`, {
-        userInput: {
+        payload: {
           message: userInput,
           assistantId,
         },
       })
       .then((res) => res)
       .then(({ data }) => {
-        setThread(data?.messages?.reverse()); // do this on the server
-        return setMessage(data.message);
+        setUserInput("");
+        setThread(data?.messages);
       });
   };
 
@@ -108,11 +108,20 @@ function Assistant({ endpoint }) {
           <Threads threads={threads} getMessages={getMessages} />
           {threads.length && showChatBox && (
             <Messager
-              message={message}
               name={assistant.name}
               handleUserInput={handleUserInput}
-              sendMessage={sendMessage}
+              sendMessage={(e) => {
+                e.preventDefault();
+                sendMessage(
+                  { message: userInput, assistantId },
+                  setUserInput,
+                  `http://localhost:3001${endpoint}/${selectedThread}`,
+                  setThread
+                );
+              }}
+              // sendMessage={sendMessage1}
               userInput={userInput}
+              setUserInput={setUserInput}
               messages={convertThreadToMessages(thread, assistantList)}
             />
           )}

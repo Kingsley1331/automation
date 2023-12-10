@@ -1,14 +1,34 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import {
+  startRecording,
+  stopRecording,
+  sendAudio,
+  getTextFromAudio,
+  playAudio,
+} from "../utilities/audio";
 import "./Messager.css";
 
 function Messager({
-  message,
   handleUserInput,
   sendMessage,
   userInput,
+  setUserInput,
   messages,
   name,
 }) {
+  const [recordButtonText, setRecordButtonText] = useState("Start Recording");
+  const [recorder, setRecorder] = useState(null);
+  const [disableRecord, setDisableRecord] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+
+  useEffect(() => {
+    if (audioBlob) {
+      sendAudio(audioBlob, setUserInput);
+      getTextFromAudio(setUserInput);
+    }
+  }, [audioBlob, setUserInput]);
+
+  console.log("===============>userInput", userInput);
   return (
     <div>
       Assistant Name: {name}
@@ -17,7 +37,8 @@ function Messager({
           messages.map((message) => {
             return (
               <p key={message.id}>
-                <strong>{message.name}</strong>: {message.content}
+                <strong>{message.name || message.role}</strong>:{" "}
+                {message.content}
               </p>
             );
           })}
@@ -29,6 +50,24 @@ function Messager({
             placeholder="Ask me anything"
           />
           <button onClick={sendMessage}>Send</button>
+          <button onClick={playAudio}>Replay</button>
+        </div>
+
+        <div>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              if (!disableRecord) {
+                startRecording(setAudioBlob, setDisableRecord, setRecorder);
+                setRecordButtonText("Stop Recording");
+              } else {
+                stopRecording(recorder, setDisableRecord);
+                setRecordButtonText("Start Recording");
+              }
+            }}
+          >
+            {recordButtonText}
+          </button>
         </div>
       </div>
     </div>
