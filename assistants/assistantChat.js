@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import "dotenv/config";
 import getThread from "./api/getThread.js";
 import getAssistants from "./api/getAssistants.js";
+import convertTextToMp3 from "../utilities/convertTextToMp3.js";
 
 // Create a OpenAI connection
 
@@ -78,6 +79,7 @@ async function mathsTeacher(userInput, threadId) {
         .pop();
 
       lastMessage = lastMessageForRun.content[0].text.value;
+      await convertTextToMp3(lastMessage);
     }
 
     return {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Messager from "../../components/Messager";
+import Navigation from "../../components/Navigation";
 
 function Chatbot({ endpoint }) {
-  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState("");
   const [userInput, setUserInput] = useState(
     "How many faces does an icosahedron have?"
   );
@@ -14,7 +14,7 @@ function Chatbot({ endpoint }) {
       .then((res) => res)
       .then(({ data }) => {
         console.log("get data ==>", data);
-        return setMessage(data.message);
+        return setMessages(data.messages);
       });
   }, [endpoint]);
 
@@ -31,17 +31,35 @@ function Chatbot({ endpoint }) {
       .then((res) => res)
       .then(({ data }) => {
         console.log("post data ==>", data);
-        return setMessage(data.message);
+        return setMessages(data.messages);
       });
   };
-
+  console.log("messages", messages);
   return (
-    <Messager
-      message={message}
-      handleUserInput={handleUserInput}
-      sendMessage={sendMessage}
-      userInput={userInput}
-    />
+    <>
+      <Navigation />
+      <div>
+        <div className="chatBox">
+          {messages?.length &&
+            messages.map((message) => {
+              return (
+                <p key={message.id}>
+                  <strong>{message.name}</strong> {message.message.content}
+                </p>
+              );
+            })}
+          <div className="inputWrapper">
+            <textarea
+              type="text"
+              onChange={handleUserInput}
+              value={userInput}
+              placeholder="Ask me anything"
+            />
+            <button onClick={sendMessage}>Send</button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 

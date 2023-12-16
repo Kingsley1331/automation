@@ -19,7 +19,7 @@ async function main(userInput) {
   const response = completion.choices[0]?.message?.content;
   console.log(response);
   console.log("choices", completion.choices);
-  return response;
+  return completion.choices;
 }
 
 export default main;

@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import MathsTeacher from "./pages/assistants/AssistantsPage";
 import Chatbot from "./pages/chatbots/Chatbot";
+import TextToSpeech from "./pages/chatbots/TextToSpeech";
 import "./App.css";
 import Assistant from "./pages/assistants/AssistantPage";
 
@@ -19,6 +20,10 @@ const App = () => {
         <Route
           path="/chatbots/chat/message"
           element={<Chatbot endpoint="/chatbots/chat/message" />}
+        />
+        <Route
+          path="/text-to-speech/message"
+          element={<TextToSpeech endpoint="/text-to-speech/message" />}
         />
         <Route
           path="/assistants/message"

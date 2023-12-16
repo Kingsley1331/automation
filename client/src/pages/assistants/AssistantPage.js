@@ -8,7 +8,6 @@ import Navigation from "../../components/Navigation";
 import "./AssistantPage.css";
 
 function Assistant({ endpoint }) {
-  const [message, setMessage] = useState("");
   const [selectedThread, setSelectedThread] = useState("");
   const [threads, setThreads] = useState([]);
   const [thread, setThread] = useState([]);
@@ -20,7 +19,6 @@ function Assistant({ endpoint }) {
   const { assistants } = useContext(Context);
 
   const { assistantId } = useParams();
-  // what is the shape of each face?
 
   const convertThreadToMessages = (thread, assistants) => {
     const messages = thread.map((message) => {
@@ -84,21 +82,13 @@ function Assistant({ endpoint }) {
     setUserInput(e.target.value);
   };
 
-  const sendMessage = (e) => {
-    e.preventDefault();
-    axios
-      .post(`http://localhost:3001${endpoint}/${selectedThread}`, {
-        userInput: {
-          message: userInput,
-          assistantId,
-        },
-      })
-      .then((res) => res)
-      .then(({ data }) => {
-        setThread(data?.messages?.reverse()); // do this on the server
-        return setMessage(data.message);
-      });
-  };
+  const sendMessageFn = (callback) =>
+    callback(
+      { message: userInput, assistantId },
+      setUserInput,
+      `http://localhost:3001${endpoint}/${selectedThread}`,
+      setThread
+    );
 
   return (
     <>
@@ -108,11 +98,11 @@ function Assistant({ endpoint }) {
           <Threads threads={threads} getMessages={getMessages} />
           {threads.length && showChatBox && (
             <Messager
-              message={message}
               name={assistant.name}
               handleUserInput={handleUserInput}
-              sendMessage={sendMessage}
+              sendMessageFn={sendMessageFn}
               userInput={userInput}
+              setUserInput={setUserInput}
               messages={convertThreadToMessages(thread, assistantList)}
             />
           )}

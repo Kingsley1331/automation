@@ -1,7 +1,10 @@
 import express from "express";
 import cors from "cors";
+import multer from "multer";
 import "dotenv/config";
 import main from "./chatbots/chat.js";
+import textToSpeech from "./chatbots/textToSpeech.js";
+import speechToText from "./chatbots/speechToText.js";
 import assistantChat from "./assistants/assistantChat.js";
 import getAssistantIds from "./assistants/api/getAssistantIds.js";
 import getAssistant from "./assistants/api/getAssistant.js";
@@ -10,6 +13,10 @@ import getThread from "./assistants/api/getThread.js";
 import getThreads from "./assistants/api/threads/getThreads.js";
 import createThread from "./assistants/api/threads/createThread.js";
 import deleteThread from "./assistants/api/threads/deleteThread.js";
+import streamAudioToClient from "./utilities/streamAudioToClient.js";
+import convertBlobToMp3 from "./utilities/convertBlobToMp3.js";
+
+const upload = multer({ dest: "uploads/" });
 
 const app = express();
 const port = 3001;
@@ -22,16 +29,42 @@ app.get("/", (req, res) => {
 });
 
 app.get("/chatbots/chat/message", async (req, res) => {
-  const message = await main();
-  res.json({ message });
+  const messages = await main();
+  res.json({ messages });
 });
 
 app.post("/chatbots/chat/message", async (req, res) => {
   const { userInput } = req.body;
-  const message = await main(userInput);
-  res.json({ message });
+  const messages = await main(userInput);
+  res.json({ messages });
+});
+/*****************************************************************************************************************/
+app.get("/text-to-speech/message", async (req, res) => {
+  const messages = await textToSpeech();
+  res.json({ messages });
 });
 
+app.post("/text-to-speech/message", async (req, res) => {
+  const { payload } = req.body;
+  const messages = await textToSpeech(payload);
+  console.log("========messages", messages);
+  res.json({ messages });
+});
+
+app.get("/speech", (req, res) => {
+  streamAudioToClient(req, res, "speech/speech.mp3");
+});
+
+app.post("/speech", upload.single("audio"), async (req, res) => {
+  convertBlobToMp3(req, res);
+});
+
+app.get("/text-from-audio", async (req, res) => {
+  const textFromAudio = await speechToText();
+  console.log("===================>textFromAudio", textFromAudio);
+  res.json({ textFromAudio });
+});
+/*****************************************************************************************************************/
 app.get("/assistants/message/:threadId", async (req, res) => {
   const { threadId } = req.params;
   const messages = await getThread(threadId);
@@ -45,9 +78,10 @@ app.get("/assistants/message/:threadId", async (req, res) => {
 /** Is this still needed? */
 app.post("/assistants/message/:threadId", async (req, res) => {
   const { threadId } = req.params;
-  const { userInput } = req.body;
-  const data = await assistantChat(userInput, threadId);
-  const { message, runId, assistantId, assistantList, messages } = data || {};
+  const { payload } = req.body;
+  const data = await assistantChat(payload, threadId);
+  let { message, runId, assistantId, assistantList, messages } = data || {};
+  messages = messages.reverse();
   res.json({ message, runId, assistantId, assistantList, messages });
 });
 
