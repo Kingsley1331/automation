@@ -5,12 +5,13 @@ import {
   sendAudio,
   getTextFromAudio,
   playAudio,
+  sendMessage,
 } from "../utilities/audio";
 import "./Messager.css";
 
 function Messager({
   handleUserInput,
-  sendMessage,
+  sendMessageFn,
   userInput,
   setUserInput,
   messages,
@@ -49,7 +50,7 @@ function Messager({
             value={userInput}
             placeholder="Ask me anything"
           />
-          <button onClick={sendMessage}>Send</button>
+          <button onClick={() => sendMessageFn(sendMessage)}>Send</button>
           <button onClick={playAudio}>Replay</button>
         </div>
 

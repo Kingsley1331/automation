@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navigation from "../../components/Navigation";
-import { sendMessage } from "../../utilities/audio";
 import Messager from "../../components/Messager";
 
 function Chatbot({ endpoint }) {
@@ -25,20 +24,20 @@ function Chatbot({ endpoint }) {
   console.log("messages", messages);
   console.log("userInput", userInput);
 
+  const sendMessageFn = (callback) =>
+    callback(
+      [...messages, { role: "user", content: userInput }],
+      setUserInput,
+      `http://localhost:3001${endpoint}`,
+      setMessages
+    );
+
   return (
     <>
       <Navigation />
       <Messager
         handleUserInput={handleUserInput}
-        sendMessage={(e) => {
-          e.preventDefault();
-          sendMessage(
-            [...messages, { role: "user", content: userInput }],
-            setUserInput,
-            `http://localhost:3001${endpoint}`,
-            setMessages
-          );
-        }}
+        sendMessageFn={sendMessageFn}
         userInput={userInput}
         setUserInput={setUserInput}
         messages={messages}

@@ -5,7 +5,6 @@ import { useParams } from "react-router-dom";
 import { Context } from "../../App";
 import Threads from "../../components/Threads";
 import Navigation from "../../components/Navigation";
-import { sendMessage } from "../../utilities/audio";
 import "./AssistantPage.css";
 
 function Assistant({ endpoint }) {
@@ -20,7 +19,6 @@ function Assistant({ endpoint }) {
   const { assistants } = useContext(Context);
 
   const { assistantId } = useParams();
-  // what is the shape of each face?
 
   const convertThreadToMessages = (thread, assistants) => {
     const messages = thread.map((message) => {
@@ -84,6 +82,14 @@ function Assistant({ endpoint }) {
     setUserInput(e.target.value);
   };
 
+  const sendMessageFn = (callback) =>
+    callback(
+      { message: userInput, assistantId },
+      setUserInput,
+      `http://localhost:3001${endpoint}/${selectedThread}`,
+      setThread
+    );
+
   return (
     <>
       <Navigation />
@@ -94,15 +100,7 @@ function Assistant({ endpoint }) {
             <Messager
               name={assistant.name}
               handleUserInput={handleUserInput}
-              sendMessage={(e) => {
-                e.preventDefault();
-                sendMessage(
-                  { message: userInput, assistantId },
-                  setUserInput,
-                  `http://localhost:3001${endpoint}/${selectedThread}`,
-                  setThread
-                );
-              }}
+              sendMessageFn={sendMessageFn}
               userInput={userInput}
               setUserInput={setUserInput}
               messages={convertThreadToMessages(thread, assistantList)}
