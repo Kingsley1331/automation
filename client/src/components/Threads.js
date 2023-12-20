@@ -37,9 +37,9 @@ function Threads({ threads, getMessages }) {
       <h1>Threads</h1>
       <div className="message-threads">
         {threads &&
-          threads.map((thread) => (
+          threads.map((thread, index) => (
             <div key={thread} className="message-thread">
-              <p>{thread.substr(0, 8)}</p>
+              <p>Chat {index + 1}</p>
               <button onClick={() => getMessages(thread)}>Resume chat</button>
               <button onClick={() => deleteThread(thread)}>Delete chat</button>
             </div>

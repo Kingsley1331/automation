@@ -4,6 +4,7 @@ import Navigation from "./components/Navigation";
 import MathsTeacher from "./pages/assistants/AssistantsPage";
 import Chatbot from "./pages/chatbots/Chatbot";
 import TextToSpeech from "./pages/chatbots/TextToSpeech";
+import Vision from "./pages/chatbots/Vision";
 import "./App.css";
 import Assistant from "./pages/assistants/AssistantPage";
 
@@ -20,6 +21,10 @@ const App = () => {
         <Route
           path="/chatbots/chat/message"
           element={<Chatbot endpoint="/chatbots/chat/message" />}
+        />
+        <Route
+          path="/vision/message"
+          element={<Vision endpoint="/vision/message" />}
         />
         <Route
           path="/text-to-speech/message"

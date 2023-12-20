@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import convertTextToMp3 from "../utilities/convertTextToMp3.js";
+import "dotenv/config";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 

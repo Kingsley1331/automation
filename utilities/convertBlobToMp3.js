@@ -43,3 +43,24 @@ const convertBlobToMp3 = (req, res) => {
 };
 
 export default convertBlobToMp3;
+
+export const convertBlobToImage = (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  // Get the buffer from multer and the file extension
+  const buffer = req.file.buffer;
+  const extension = req.file.originalname.split(".").pop();
+
+  // Specify the path to save the image
+  const filePath = `uploads/imageFiles/${req.file.filename}.${extension}`;
+
+  // Write the buffer to a file
+  fs.writeFile(filePath, buffer, (err) => {
+    if (err) {
+      return res.status(500).send("Error saving the file.");
+    }
+    // res.send("File uploaded and converted successfully.");
+  });
+};

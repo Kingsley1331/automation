@@ -4,19 +4,23 @@ export const sendMessage = (
   payload,
   setUserInput,
   apiEndpoint,
-  setMessages
+  setMessages,
+  selectedFileName
 ) => {
   // const payload = [...messages, { role: "user", content: userInput }];
   axios
     .post(apiEndpoint, {
       payload,
+      selectedFileName,
     })
     .then((res) => res)
     .then(({ data }) => {
       console.log("post data ==>", data);
       playAudio();
       setUserInput("");
-      return setMessages(data.messages);
+      if (data?.messages) {
+        return setMessages(data.messages);
+      }
     });
 };
 

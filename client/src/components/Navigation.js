@@ -13,6 +13,9 @@ const List = () => {
           <NavLink to="/chatbots/chat/message">Chatbot</NavLink>
         </li>
         <li>
+          <NavLink to="/vision/message">Vision</NavLink>
+        </li>
+        <li>
           <NavLink to="/text-to-speech/message">Text To Speech</NavLink>
         </li>
         <li>
