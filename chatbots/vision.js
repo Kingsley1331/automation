@@ -14,21 +14,36 @@ async function vision(payload, selectedFileName) {
     );
   }
   console.log("selectedFileName ==>", selectedFileName);
-  if (selectedFileName) {
-    base64Image = convertImageToBase64(selectedFileName);
-  }
+  // if (selectedFileName) {
+  //   base64Image = convertImageToBase64(selectedFileName);
+  // }
+
+  // if (payload) {
+  //   const lastUserMessage = payload.pop();
+  //   if (selectedFileName) {
+  //     lastUserMessage.content.push({
+  //       type: "image_url",
+  //       image_url: {
+  //         url: "data:image/jpeg;base64," + base64Image,
+  //       },
+  //     });
+  //   }
+  //   payload.push(lastUserMessage);
+  // }
 
   if (payload) {
-    const lastUserMessage = payload.pop();
-    if (selectedFileName) {
-      lastUserMessage.content.push({
-        type: "image_url",
-        image_url: {
-          url: "data:image/jpeg;base64," + base64Image,
-        },
-      });
-    }
-    payload.push(lastUserMessage);
+    payload.forEach((message) => {
+      if (message.role === "user" && message.content[0].metadata) {
+        const filename = message.content[0].metadata.split("/").pop();
+        message.content.push({
+          type: "image_url",
+          image_url: {
+            url: `data:image/jpeg;base64,
+          ${convertImageToBase64(filename)}`,
+          },
+        });
+      }
+    });
   }
 
   let messages;
@@ -39,6 +54,11 @@ async function vision(payload, selectedFileName) {
   if (payload) {
     messages = [...payload];
   }
+
+  console.log(
+    "===============================> updated messages",
+    messages.map((message) => message.content)
+  );
 
   const completion = await openai.chat.completions.create({
     messages,
