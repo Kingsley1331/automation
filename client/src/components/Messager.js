@@ -105,13 +105,6 @@ function Messager({
                 {content[0]?.metadata && (
                   <img width="300" src={content[0]?.metadata} alt="vision" />
                 )}
-                {/* {content[1]?.image_url?.url && (
-                  <img
-                    width="300"
-                    src={content[1]?.image_url?.url}
-                    alt="vision"
-                  />
-                )} */}
               </>
             );
           })}
@@ -149,10 +142,6 @@ function Messager({
           >
             {recordButtonText}
           </button>
-          {/* <div>
-            <input type="file" onChange={handleImageChange} />
-            <button onClick={handleSubmit}>Upload</button>
-          </div> */}
           <div>
             <input type="file" onChange={handleFileInput} />
           </div>

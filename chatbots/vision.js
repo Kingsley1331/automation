@@ -6,7 +6,6 @@ import { convertImageToBase64 } from "../utilities/convertBufferToImage.js";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 async function vision(payload, selectedFileName) {
-  let userMessages;
   let base64Image = "";
   if (payload) {
     console.log(
@@ -20,28 +19,16 @@ async function vision(payload, selectedFileName) {
   }
 
   if (payload) {
-    userMessages = payload.map((msg) => {
-      if (typeof msg.content[1] === "object" && msg.role === "user") {
-        msg.content = [msg.content[0]];
-      }
-      return msg;
-    });
-    const lastUserMessage = userMessages.pop();
+    const lastUserMessage = payload.pop();
     if (selectedFileName) {
       lastUserMessage.content.push({
         type: "image_url",
         image_url: {
-          // url,
-          // url: base64Image,
-          // url: `${__dirname}/uploads/imageFiles/03-june_puppies.webp`,
           url: "data:image/jpeg;base64," + base64Image,
-          // url: "https://www.tatesofsussex.co.uk/wp-content/uploads/2021/06/Orchids.jpeg",
-          // url: "uploads/imageFiles/puppy-dental-care.jpg",
-          // url: "http://localhost:3001/uploads\\imageFiles\\puppy-dental-care.jpg",
         },
       });
     }
-    userMessages.push(lastUserMessage);
+    payload.push(lastUserMessage);
   }
 
   let messages;
@@ -50,7 +37,7 @@ async function vision(payload, selectedFileName) {
   }
 
   if (payload) {
-    messages = [...userMessages];
+    messages = [...payload];
   }
 
   const completion = await openai.chat.completions.create({
@@ -65,11 +52,12 @@ async function vision(payload, selectedFileName) {
   const message = completion.choices[0]?.message?.content;
   console.log("message", message);
   await convertTextToMp3(message);
-  // messages.map((message) => {
-  //   if (message.content[0]?.metadata && message.content[1]?.image_url) {
-  //     message.content[1].image_url.url = message.content[0]?.metadata;
-  //   }
-  // });
+  messages.map((msg) => {
+    if (typeof msg.content[1] === "object" && msg.role === "user") {
+      msg.content = [msg.content[0]];
+    }
+    return msg;
+  });
   return [...messages, ...completion.choices.map((choice) => choice.message)];
 }
 
