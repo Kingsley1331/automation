@@ -6,30 +6,12 @@ import { convertImageToBase64 } from "../utilities/convertBufferToImage.js";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 async function vision(payload, selectedFileName) {
-  let base64Image = "";
   if (payload) {
     console.log(
       "payload ==>",
       payload.map((message) => message.content)
     );
   }
-  console.log("selectedFileName ==>", selectedFileName);
-  // if (selectedFileName) {
-  //   base64Image = convertImageToBase64(selectedFileName);
-  // }
-
-  // if (payload) {
-  //   const lastUserMessage = payload.pop();
-  //   if (selectedFileName) {
-  //     lastUserMessage.content.push({
-  //       type: "image_url",
-  //       image_url: {
-  //         url: "data:image/jpeg;base64," + base64Image,
-  //       },
-  //     });
-  //   }
-  //   payload.push(lastUserMessage);
-  // }
 
   if (payload) {
     payload.forEach((message) => {
@@ -54,11 +36,6 @@ async function vision(payload, selectedFileName) {
   if (payload) {
     messages = [...payload];
   }
-
-  console.log(
-    "===============================> updated messages",
-    messages.map((message) => message.content)
-  );
 
   const completion = await openai.chat.completions.create({
     messages,

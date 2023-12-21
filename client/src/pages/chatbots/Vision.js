@@ -3,11 +3,6 @@ import axios from "axios";
 import Navigation from "../../components/Navigation";
 import Messager from "../../components/Messager";
 
-const images = [
-  "https://www.tatesofsussex.co.uk/wp-content/uploads/2021/06/Orchids.jpeg",
-  "https://cdn.britannica.com/79/232779-050-6B0411D7/German-Shepherd-dog-Alsatian.jpg",
-];
-
 function Chatbot({ endpoint }) {
   const [messages, setMessages] = useState([
     { role: "system", content: "You are a helpful assistant." },
@@ -35,28 +30,6 @@ function Chatbot({ endpoint }) {
 
   const sendMessageFn = (callback, selectedFileName) => {
     console.log("========================>selectedFileName", selectedFileName);
-    // const sendMessageFn = (callback, imageUrl, setImageUrl) => {
-
-    // const content = [
-    //   {
-    //     type: "text",
-    //     text: "Can you describe what you see in this image?",
-    //   },
-    //   {
-    //     type: "image_url",
-    //     image_url: {
-    //       url: images[0],
-    //     },
-    //   },
-    // ];
-    // setMessages((msgs) =>
-    //   msgs.map((msg) => {
-    //     if (msg.content[1]) {
-    //       msg.content = [msg.content[0]];
-    //     }
-    //     return msg;
-    //   })
-    // );
     callback(
       [
         ...messages,
@@ -81,18 +54,9 @@ function Chatbot({ endpoint }) {
       ],
       setUserInput,
       `http://localhost:3001${endpoint}`,
-      setMessages,
-      selectedFileName
-      // setImageUrl
+      setMessages
     );
   };
-  // const sendMessageFn = (callback) =>
-  //   callback(
-  //     [...messages, { role: "user", content: userInput }],
-  //     setUserInput,
-  //     `http://localhost:3001${endpoint}`,
-  //     setMessages
-  //   );
 
   return (
     <>

@@ -4,14 +4,11 @@ export const sendMessage = (
   payload,
   setUserInput,
   apiEndpoint,
-  setMessages,
-  selectedFileName
+  setMessages
 ) => {
-  // const payload = [...messages, { role: "user", content: userInput }];
   axios
     .post(apiEndpoint, {
       payload,
-      selectedFileName,
     })
     .then((res) => res)
     .then(({ data }) => {

@@ -64,8 +64,8 @@ app.post("/vision/message", uploadImage.single("image"), async (req, res) => {
   console.log(
     "===============================++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
   );
-  const { payload, selectedFileName } = req.body;
-  const messages = await vision(payload, selectedFileName);
+  const { payload } = req.body;
+  const messages = await vision(payload);
   console.log("========messages", messages);
   if (req.file) {
     convertBufferToImage(req, res);

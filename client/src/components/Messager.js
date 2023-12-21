@@ -119,7 +119,6 @@ function Messager({
             onClick={async () => {
               await uploadFile();
               sendMessageFn(sendMessage, selectedFile?.name);
-              // sendMessageFn(sendMessage, imageUrl, setImageUrl);
             }}
           >
             Send
