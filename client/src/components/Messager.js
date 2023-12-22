@@ -9,6 +9,10 @@ import {
   sendMessage,
 } from "../utilities/audio";
 import "./Messager.css";
+import UploadIcon from "./icons/upload.js";
+import Microphone from "./icons/microphone.js";
+import Send from "./icons/send.js";
+import close from "./icons/close.png";
 
 function Messager({
   handleUserInput,
@@ -18,11 +22,10 @@ function Messager({
   messages,
   name,
 }) {
-  const [recordButtonText, setRecordButtonText] = useState("Start Recording");
   const [recorder, setRecorder] = useState(null);
   const [disableRecord, setDisableRecord] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
-  // const [imageUrl, setImageUrl] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
   // const handleImageUpload = (event) => {
@@ -30,7 +33,21 @@ function Messager({
   // };
 
   const handleFileInput = (e) => {
-    setSelectedFile(e.target.files[0]);
+    const file = e.target.files[0];
+    console.log("============================>file", file);
+    setSelectedFile(file);
+    if (!file) {
+      setImageUrl(null);
+      setSelectedFile(null);
+      return;
+    }
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setImageUrl(reader.result);
+    };
+
+    reader.readAsDataURL(file);
   };
 
   // const handleImageChange = (e) => {
@@ -89,7 +106,7 @@ function Messager({
   console.log("===============>userInput", userInput);
 
   return (
-    <div>
+    <div className="message-wrapper">
       Assistant Name: {name}
       <div className="chatBox">
         {messages?.length &&
@@ -108,6 +125,8 @@ function Messager({
               </>
             );
           })}
+      </div>
+      <div className="fixed">
         <div className="inputWrapper">
           <textarea
             type="text"
@@ -115,34 +134,65 @@ function Messager({
             value={userInput}
             placeholder="Ask me anything"
           />
-          <button
+          <div
+            className={`send ${!userInput && "--inactive"}`}
+            role="button"
             onClick={async () => {
               await uploadFile();
+              if (!userInput) return;
               sendMessageFn(sendMessage, selectedFile?.name);
+              setImageUrl(null);
+              setSelectedFile(null);
             }}
           >
-            Send
-          </button>
-          <button onClick={playAudio}>Replay</button>
+            <Send opacity={userInput ? 1 : 0.4} />
+          </div>
+          {/* <button onClick={playAudio}>Replay</button> */}
         </div>
 
-        <div>
-          <button
+        <div className="icons">
+          <div
+            className="microphone"
+            role="button"
+            disabled
             onClick={(e) => {
               e.preventDefault();
               if (!disableRecord) {
+                console.log("RECORDING");
                 startRecording(setAudioBlob, setDisableRecord, setRecorder);
-                setRecordButtonText("Stop Recording");
               } else {
                 stopRecording(recorder, setDisableRecord);
-                setRecordButtonText("Start Recording");
               }
             }}
           >
-            {recordButtonText}
-          </button>
-          <div>
-            <input type="file" onChange={handleFileInput} />
+            {disableRecord ? <div className="recording" /> : <Microphone />}
+          </div>
+
+          <div class="file-input">
+            <input
+              type="file"
+              id="file"
+              class="file"
+              onChange={handleFileInput}
+            />
+            <label for="file">
+              <UploadIcon role="button" />
+            </label>
+            {imageUrl && (
+              <div className="preview">
+                <img height="100" src={imageUrl} alt="preview"></img>
+                <div
+                  className="close"
+                  role="button"
+                  onClick={() => {
+                    setImageUrl(null);
+                    setSelectedFile(null);
+                  }}
+                >
+                  <img width="20" src={close} alt="close"></img>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

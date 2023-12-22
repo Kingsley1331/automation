@@ -5,7 +5,7 @@ import { convertImageToBase64 } from "../utilities/convertBufferToImage.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-async function vision(payload, selectedFileName) {
+async function vision(payload) {
   if (payload) {
     console.log(
       "payload ==>",
