@@ -13,6 +13,8 @@ import UploadIcon from "./icons/upload.js";
 import Microphone from "./icons/microphone.js";
 import Send from "./icons/send.js";
 import close from "./icons/close.png";
+import ReactMarkdown from "react-markdown";
+import gfm from "remark-gfm";
 
 function Messager({
   handleUserInput,
@@ -111,14 +113,18 @@ function Messager({
       <div className="chatBox">
         {messages?.length &&
           messages.map((message) => {
+            if (message.role === "system") return null;
             const { content } = message;
             return (
               <>
-                <p key={message.id}>
-                  <strong>{message.name || message.role}</strong>:{" "}
-                  {typeof content === "string" ? content : content[0].text}
-                </p>
-
+                <div key={message.id}>
+                  <ReactMarkdown remarkPlugins={[gfm]}>
+                    {`**${message.name || message.role}**: 
+                      ${
+                        typeof content === "string" ? content : content[0].text
+                      }`}
+                  </ReactMarkdown>
+                </div>
                 {content[0]?.metadata && (
                   <img width="300" src={content[0]?.metadata} alt="vision" />
                 )}
