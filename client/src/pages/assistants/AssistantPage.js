@@ -95,7 +95,11 @@ function Assistant({ endpoint }) {
       <Navigation />
       <div className="messages-wrapper">
         <div className="messages-container">
-          <Threads threads={threads} getMessages={getMessages} />
+          <Threads
+            threads={threads}
+            getMessages={getMessages}
+            setThreads={setThreads}
+          />
           {threads.length && showChatBox && (
             <Messager
               name={assistant.name}

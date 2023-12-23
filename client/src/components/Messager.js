@@ -109,9 +109,9 @@ function Messager({
 
   return (
     <div className="message-wrapper">
-      Assistant Name: {name}
+      <h3 className="title">Assistant Name: {name}</h3>
       <div className="chatBox">
-        {messages?.length &&
+        {!!messages?.length &&
           messages.map((message) => {
             if (message.role === "system") return null;
             const { content } = message;
