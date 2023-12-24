@@ -7,6 +7,10 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const speechFile = path.resolve("./speech/speech.mp3");
 
 async function convertTextToMp3(text) {
+  console.log(
+    "========================================================= text",
+    text
+  );
   const mp3 = await openai.audio.speech.create({
     model: "tts-1",
     voice: "alloy",

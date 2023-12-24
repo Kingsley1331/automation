@@ -20,6 +20,7 @@ import vision from "./chatbots/vision.js";
 import convertBufferToImage, {
   convertBufferToBase64,
 } from "./utilities/convertBufferToImage.js";
+import convertTextToMp3 from "./utilities/convertTextToMp3.js";
 
 const upload = multer({ dest: "uploads/" });
 const storage = multer.memoryStorage();
@@ -46,6 +47,14 @@ app.post("/chatbots/chat/message", async (req, res) => {
   const messages = await main(userInput);
   res.json({ messages });
 });
+
+app.post("/text-to-audio", async (req, res) => {
+  const { text } = req.body;
+  await convertTextToMp3(text);
+  // const messages = await main(userInput);
+  streamAudioToClient(req, res, "speech/speech.mp3");
+});
+
 /************************************************** VISION ***************************************************************/
 
 app.get("/vision/message", async (req, res) => {

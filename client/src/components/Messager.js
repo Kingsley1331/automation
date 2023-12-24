@@ -7,11 +7,14 @@ import {
   getTextFromAudio,
   playAudio,
   sendMessage,
+  getAudioFromText,
 } from "../utilities/audio";
 import "./Messager.css";
 import UploadIcon from "./icons/upload.js";
 import Microphone from "./icons/microphone.js";
-import Send from "./icons/send.js";
+import SendIcon from "./icons/send.js";
+import SoundOnIcon from "./icons/sound-on.js";
+import SoundOffIcon from "./icons/sound-off.js";
 import close from "./icons/close.png";
 import MarkdownRenderer from "../tools/MarkdownRenderer";
 import hljs from "highlight.js/lib/core";
@@ -33,6 +36,8 @@ function Messager({
   const [audioBlob, setAudioBlob] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isSoundOn, setIsSoundOn] = useState(true);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   // const handleImageUpload = (event) => {
   //   setImageUrl(URL.createObjectURL(event.target.files[0]));
@@ -113,6 +118,8 @@ function Messager({
     }
   }, [audioBlob, setUserInput]);
 
+  console.log("isAudioPlaying", isAudioPlaying);
+
   return (
     <div className="message-wrapper">
       <h3 className="title">Assistant Name: {name}</h3>
@@ -122,17 +129,42 @@ function Messager({
             if (message.role === "system") return null;
             const { content } = message;
             return (
-              <>
-                <div key={message.id}>
-                  <MarkdownRenderer
-                    content={`**${message.name || message.role}**: 
-                      ${typeof content === "string" ? content : content[0]}`}
-                  />
+              <div className="message-container">
+                <div className="message-wrapper">
+                  <div key={message.id}>
+                    <MarkdownRenderer
+                      content={`**${message.name || message.role}**: 
+                      ${
+                        typeof content === "string" ? content : content[0].text
+                      }`}
+                    />
+                  </div>
+                  {content[0]?.metadata && (
+                    <img width="300" src={content[0]?.metadata} alt="vision" />
+                  )}
                 </div>
-                {content[0]?.metadata && (
-                  <img width="300" src={content[0]?.metadata} alt="vision" />
+                {message.role === "assistant" && (
+                  <div
+                    onClick={async () => {
+                      if (!isAudioPlaying) {
+                        setIsAudioPlaying(true);
+                        await getAudioFromText(
+                          typeof content === "string"
+                            ? content
+                            : content[0].text,
+                          () => setIsAudioPlaying(false)
+                        );
+                      }
+                    }}
+                    role="button"
+                    className={`sound_small ${
+                      (!isSoundOn || isAudioPlaying) && "--opaque"
+                    }`}
+                  >
+                    <SoundOnIcon size={12} />
+                  </div>
                 )}
-              </>
+              </div>
             );
           })}
       </div>
@@ -150,13 +182,22 @@ function Messager({
             onClick={async () => {
               await uploadFile();
               if (!userInput) return;
-              sendMessageFn(sendMessage, selectedFile?.name);
+              sendMessageFn(sendMessage, selectedFile?.name, isSoundOn); // TODO: is there a better way to do this? without passing in the selectedFile.name and isSoundOn?
               setImageUrl(null);
               setSelectedFile(null);
             }}
           >
-            <Send opacity={userInput ? 1 : 0.4} />
+            <SendIcon opacity={userInput ? 1 : 0.4} />
           </div>
+
+          <div
+            onClick={() => setIsSoundOn((state) => !state)}
+            className="sound"
+            role="button"
+          >
+            {isSoundOn ? <SoundOnIcon /> : <SoundOffIcon />}
+          </div>
+
           {/* <button onClick={playAudio}>Replay</button> */}
         </div>
 

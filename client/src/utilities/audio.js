@@ -4,7 +4,8 @@ export const sendMessage = (
   payload,
   setUserInput,
   apiEndpoint,
-  setMessages
+  setMessages,
+  isSoundOn
 ) => {
   axios
     .post(apiEndpoint, {
@@ -13,7 +14,9 @@ export const sendMessage = (
     .then((res) => res)
     .then(({ data }) => {
       console.log("post data ==>", data);
-      playAudio();
+      if (isSoundOn) {
+        playAudio();
+      }
       setUserInput("");
       if (data?.messages) {
         return setMessages(data.messages);
@@ -21,7 +24,7 @@ export const sendMessage = (
     });
 };
 
-export const playAudio = async () => {
+export const playAudio = async (callback) => {
   const { data } = await axios.get("http://localhost:3001/speech", {
     responseType: "arraybuffer",
     headers: {
@@ -35,12 +38,27 @@ export const playAudio = async () => {
   const url = URL.createObjectURL(blob);
   const audio = new Audio(url);
   audio.play();
+  audio.onended = () => {
+    console.log("audio ended");
+    if (callback) {
+      callback();
+    }
+  };
+  //.addEventListener('playing',function() { myfunction(); },false)
+  console.log("audio", audio);
 };
 
 export const getTextFromAudio = async (setUserInput) => {
   const { data } = await axios.get("http://localhost:3001/text-from-audio");
   console.log("data", data);
   return data.textFromAudio;
+};
+
+export const getAudioFromText = async (text, callback) => {
+  await axios.post("http://localhost:3001/text-to-audio", {
+    text,
+  });
+  playAudio(callback);
 };
 
 export const startRecording = async (

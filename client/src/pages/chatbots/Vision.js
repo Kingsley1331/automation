@@ -28,7 +28,7 @@ function Chatbot({ endpoint }) {
   console.log("messages", messages);
   console.log("userInput", userInput);
 
-  const sendMessageFn = (callback, selectedFileName) => {
+  const sendMessageFn = (callback, selectedFileName, isSoundOn) => {
     console.log("========================>selectedFileName", selectedFileName);
     callback(
       [
@@ -54,7 +54,8 @@ function Chatbot({ endpoint }) {
       ],
       setUserInput,
       `http://localhost:3001${endpoint}`,
-      setMessages
+      setMessages,
+      isSoundOn
     );
   };
 
