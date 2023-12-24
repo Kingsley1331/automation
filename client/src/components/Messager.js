@@ -13,8 +13,12 @@ import UploadIcon from "./icons/upload.js";
 import Microphone from "./icons/microphone.js";
 import Send from "./icons/send.js";
 import close from "./icons/close.png";
-import ReactMarkdown from "react-markdown";
-import gfm from "remark-gfm";
+import MarkdownRenderer from "../tools/MarkdownRenderer";
+import hljs from "highlight.js/lib/core";
+import javascript from "highlight.js/lib/languages/javascript";
+import "highlight.js/styles/github.css";
+
+hljs.registerLanguage("javascript", javascript);
 
 function Messager({
   handleUserInput,
@@ -33,6 +37,9 @@ function Messager({
   // const handleImageUpload = (event) => {
   //   setImageUrl(URL.createObjectURL(event.target.files[0]));
   // };
+  useEffect(() => {
+    hljs.highlightAll();
+  });
 
   const handleFileInput = (e) => {
     const file = e.target.files[0];
@@ -72,6 +79,7 @@ function Messager({
   //     console.error("Error uploading the image", error);
   //   }
   // };
+
   console.log("selectedFile", selectedFile);
   const uploadFile = async () => {
     if (!selectedFile) {
@@ -105,8 +113,6 @@ function Messager({
     }
   }, [audioBlob, setUserInput]);
 
-  console.log("===============>userInput", userInput);
-
   return (
     <div className="message-wrapper">
       <h3 className="title">Assistant Name: {name}</h3>
@@ -118,12 +124,10 @@ function Messager({
             return (
               <>
                 <div key={message.id}>
-                  <ReactMarkdown remarkPlugins={[gfm]}>
-                    {`**${message.name || message.role}**: 
-                      ${
-                        typeof content === "string" ? content : content[0].text
-                      }`}
-                  </ReactMarkdown>
+                  <MarkdownRenderer
+                    content={`**${message.name || message.role}**: 
+                      ${typeof content === "string" ? content : content[0]}`}
+                  />
                 </div>
                 {content[0]?.metadata && (
                   <img width="300" src={content[0]?.metadata} alt="vision" />
