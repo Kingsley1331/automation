@@ -17,11 +17,17 @@ import SoundOnIcon from "./icons/sound-on.js";
 import SoundOffIcon from "./icons/sound-off.js";
 import close from "./icons/close.png";
 import MarkdownRenderer from "../tools/MarkdownRenderer";
-import hljs from "highlight.js/lib/core";
+import hljs from "highlight.js";
+// import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
+import css from "highlight.js/lib/languages/css";
 import "highlight.js/styles/github.css";
+import "highlight.js/styles/night-owl.css";
+import "highlight.js/styles/default.css";
+import "highlight.js/lib/languages/xml";
 
 hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("css", css);
 
 function Messager({
   handleUserInput,
