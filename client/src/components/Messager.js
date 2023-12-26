@@ -60,11 +60,15 @@ function Messager({
   // };
 
   const copyToClipboard = (e) => {
+    // e.preventDefault();
     const element =
-      e.target.parentElement.parentElement.parentElement.querySelectorAll(
+      e.target.parentElement.parentElement.parentElement.parentElement.querySelectorAll(
         "code"
       )[0];
-    // console.log("element", element);
+    console.log("element", element);
+    if (!element) {
+      return;
+    }
     const text = element.innerText;
 
     console.log(text);
@@ -108,9 +112,9 @@ function Messager({
         ".clipboard-icon-container"
       );
 
-      if (shouldAddCopyButton.length) {
-        return;
-      }
+      // if (shouldAddCopyButton.length) {
+      //   return;
+      // }
 
       console.log("shouldAddCopyButton", shouldAddCopyButton.length);
       sendIconContainer.className = "clipboard-icon-container";

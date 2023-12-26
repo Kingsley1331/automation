@@ -189,8 +189,9 @@ textarea {
 }
 
 .clipboard-icon-container div {
+  width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   background-color: #343541;
   position: relative;
@@ -213,4 +214,13 @@ textarea {
 .clipboard-icon > .language {
   /* position: absolute; */
   /* right: 0; */
+}
+
+div.copy-wrapper {
+  width: fit-content;
+}
+
+.icon-sm.--inactive {
+  opacity: 0.2;
+  cursor: default;
 }
