@@ -79,6 +79,7 @@ function Assistant({ endpoint }) {
   }, [assistantId]);
 
   const handleUserInput = (e) => {
+    e.preventDefault();
     setUserInput(e.target.value);
   };
 

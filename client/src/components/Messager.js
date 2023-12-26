@@ -87,34 +87,19 @@ function Messager({
   useEffect(() => {
     hljs.highlightAll();
 
-    const languages = document.querySelectorAll("code");
-    console.log(
-      "==========================================languages",
-      languages
-    );
-
     const highlights = document.querySelectorAll("pre");
 
-    // highlights.forEach((div) => {
-    //   // create the copy button
-    //   const copy = document.createElement("button");
-    //   copy.innerHTML = "Copy";
-    //   // add the event listener to each click
-    //   // copy.addEventListener("click", handleCopyClick)
-    //   // append the copy button to each code block
-    //   div.appendChild(copy);
-    // });
+    const shouldAddCopyButton = document.querySelectorAll(
+      ".clipboard-icon-container"
+    );
 
-    highlights.forEach((div) => {
+    if (shouldAddCopyButton.length) {
+      return;
+    }
+
+    highlights.forEach((div, index) => {
+      console.log("index", index);
       const sendIconContainer = document.createElement("div");
-
-      const shouldAddCopyButton = document.querySelectorAll(
-        ".clipboard-icon-container"
-      );
-
-      // if (shouldAddCopyButton.length) {
-      //   return;
-      // }
 
       console.log("shouldAddCopyButton", shouldAddCopyButton.length);
       sendIconContainer.className = "clipboard-icon-container";
@@ -138,7 +123,6 @@ function Messager({
         />,
         sendIconContainer
       );
-      sendIconContainer.prepend(<p>TESTTEST</p>);
       div.prepend(sendIconContainer);
       // div.append(sendIconContainer);
     });

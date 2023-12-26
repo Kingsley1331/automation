@@ -4,20 +4,10 @@ const Clipboard = ({ copyToClipboard, language }) => {
   const [clipboardText, setClipboardText] = useState("Copy code");
   const [showIcon, setShowIcon] = useState(true);
   return (
-    <div
-      // onClick={(string) => {
-      //   copyToClipboard(string);
-      //   setClipboardText("Copied");
-      //   setTimeout(() => {
-      //     setClipboardText("Copy code");
-      //   }, 2000);
-      // }}
-      className="clipboard-icon"
-    >
+    <div className="clipboard-icon">
       <p className="language">{language}</p>
       <div
         onClick={(string) => {
-          // e.preventDefault();
           copyToClipboard(string);
           setClipboardText("Copied");
           setShowIcon(false);
@@ -29,20 +19,12 @@ const Clipboard = ({ copyToClipboard, language }) => {
         className="copy-wrapper"
       >
         <svg
-          // onClick={(string) => {
-          //   copyToClipboard(string);
-          //   setClipboardText("Copied");
-          //   setTimeout(() => {
-          //     setClipboardText("Copy code");
-          //   }, 2000);
-          // }}
           width="24"
           height="24"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           class={`icon-sm ${!showIcon && "--inactive"}`}
-          // class="icon-sm"
         >
           <path
             fill-rule="evenodd"
