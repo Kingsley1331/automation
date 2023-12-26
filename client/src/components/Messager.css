@@ -179,3 +179,38 @@ textarea {
   align-items: start;
   margin: 10px 0;
 }
+
+.clipboard-icon-container {
+  position: relative;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  background-color: #343541;
+}
+
+.clipboard-icon-container div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #343541;
+  position: relative;
+  color: #d9d9e3;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.clipboard-icon-container p {
+  margin: 0 15px 0 8px;
+}
+
+.clipboard-icon {
+  /* position: relative; */
+  background-color: wheat;
+  position: absolute;
+  cursor: pointer;
+}
+
+.clipboard-icon > .language {
+  /* position: absolute; */
+  /* right: 0; */
+}

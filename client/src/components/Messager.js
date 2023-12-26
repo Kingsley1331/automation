@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import axios from "axios";
 import {
   startRecording,
@@ -15,19 +16,28 @@ import Microphone from "./icons/microphone.js";
 import SendIcon from "./icons/send.js";
 import SoundOnIcon from "./icons/sound-on.js";
 import SoundOffIcon from "./icons/sound-off.js";
+import Clipboard from "./icons/clipboard.js";
 import close from "./icons/close.png";
 import MarkdownRenderer from "../tools/MarkdownRenderer";
 import hljs from "highlight.js";
 // import hljs from "highlight.js/lib/core";
-import javascript from "highlight.js/lib/languages/javascript";
-import css from "highlight.js/lib/languages/css";
+// import javascript from "highlight.js/lib/languages/javascript";
+// import css from "highlight.js/lib/languages/css";
 import "highlight.js/styles/github.css";
-import "highlight.js/styles/night-owl.css";
-import "highlight.js/styles/default.css";
-import "highlight.js/lib/languages/xml";
+import "highlight.js/styles/felipec.css";
 
-hljs.registerLanguage("javascript", javascript);
-hljs.registerLanguage("css", css);
+// import "highlight.js/styles/night-owl.css";
+// import "highlight.js/styles/default.css";
+
+// import javascript from "highlight.js/lib/languages/javascript";
+// import xml from "highlight.js/lib/languages/xml";
+// import css from "highlight.js/lib/languages/css";
+
+// hljs.registerLanguage("javascript", javascript);
+// hljs.registerLanguage("css", css);
+// hljs.registerLanguage("xml", xml);
+
+// get the list of all highlight code blocks
 
 function Messager({
   handleUserInput,
@@ -48,8 +58,86 @@ function Messager({
   // const handleImageUpload = (event) => {
   //   setImageUrl(URL.createObjectURL(event.target.files[0]));
   // };
+
+  const copyToClipboard = (e) => {
+    const element =
+      e.target.parentElement.parentElement.parentElement.querySelectorAll(
+        "code"
+      )[0];
+    // console.log("element", element);
+    const text = element.innerText;
+
+    console.log(text);
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        // You can add some notification code here to alert the user that text has been copied
+        console.log("Text copied to clipboard");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
   useEffect(() => {
     hljs.highlightAll();
+
+    const languages = document.querySelectorAll("code");
+    console.log(
+      "==========================================languages",
+      languages
+    );
+
+    const highlights = document.querySelectorAll("pre");
+
+    // highlights.forEach((div) => {
+    //   // create the copy button
+    //   const copy = document.createElement("button");
+    //   copy.innerHTML = "Copy";
+    //   // add the event listener to each click
+    //   // copy.addEventListener("click", handleCopyClick)
+    //   // append the copy button to each code block
+    //   div.appendChild(copy);
+    // });
+
+    highlights.forEach((div) => {
+      const sendIconContainer = document.createElement("div");
+
+      const shouldAddCopyButton = document.querySelectorAll(
+        ".clipboard-icon-container"
+      );
+
+      if (shouldAddCopyButton.length) {
+        return;
+      }
+
+      console.log("shouldAddCopyButton", shouldAddCopyButton.length);
+      sendIconContainer.className = "clipboard-icon-container";
+
+      const lang = div
+        .querySelectorAll("code")[0]
+        .className.split(" ")
+        .map((a) => a)
+        .map((b) => b.match(/language-.*/))
+        .filter((c) => c)
+        .map((d) => d[0].split("language-")[1])
+        .join(", ");
+
+      console.log("language", lang);
+
+      ReactDOM.render(
+        <Clipboard
+          language={lang}
+          className="clipboard-icon"
+          copyToClipboard={copyToClipboard}
+        />,
+        sendIconContainer
+      );
+      sendIconContainer.prepend(<p>TESTTEST</p>);
+      div.prepend(sendIconContainer);
+      // div.append(sendIconContainer);
+    });
   });
 
   const handleFileInput = (e) => {
