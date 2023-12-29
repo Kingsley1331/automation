@@ -65,13 +65,11 @@ function Messager({
       e.target.parentElement.parentElement.parentElement.parentElement.querySelectorAll(
         "code"
       )[0];
-    console.log("element", element);
+
     if (!element) {
       return;
     }
     const text = element.innerText;
-
-    console.log(text);
 
     navigator.clipboard
       .writeText(text)
@@ -89,20 +87,13 @@ function Messager({
 
     const highlights = document.querySelectorAll("pre");
 
-    const shouldAddCopyButton = document.querySelectorAll(
-      ".clipboard-icon-container"
-    );
-
-    if (shouldAddCopyButton.length) {
-      return;
-    }
+    const doesIconContainerAlreadyExist = (idx) =>
+      document.querySelectorAll(`.clipboard-icon-container_${idx}`).length;
 
     highlights.forEach((div, index) => {
-      console.log("index", index);
       const sendIconContainer = document.createElement("div");
 
-      console.log("shouldAddCopyButton", shouldAddCopyButton.length);
-      sendIconContainer.className = "clipboard-icon-container";
+      sendIconContainer.className = `clipboard-icon-container clipboard-icon-container_${index}`;
 
       const lang = div
         .querySelectorAll("code")[0]
@@ -113,8 +104,6 @@ function Messager({
         .map((d) => d[0].split("language-")[1])
         .join(", ");
 
-      console.log("language", lang);
-
       ReactDOM.render(
         <Clipboard
           language={lang}
@@ -123,14 +112,16 @@ function Messager({
         />,
         sendIconContainer
       );
-      div.prepend(sendIconContainer);
-      // div.append(sendIconContainer);
+
+      if (!doesIconContainerAlreadyExist(index)) {
+        div.prepend(sendIconContainer);
+      }
     });
   });
 
   const handleFileInput = (e) => {
     const file = e.target.files[0];
-    console.log("============================>file", file);
+
     setSelectedFile(file);
     if (!file) {
       setImageUrl(null);
@@ -167,7 +158,6 @@ function Messager({
   //   }
   // };
 
-  console.log("selectedFile", selectedFile);
   const uploadFile = async () => {
     if (!selectedFile) {
       return;
