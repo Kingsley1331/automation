@@ -13,7 +13,6 @@ function Assistant({ endpoint }) {
   const [thread, setThread] = useState([]);
   const [assistant, setAssistant] = useState("");
   const [assistantList, setAssistantList] = useState("");
-  const [userInput, setUserInput] = useState("");
   const [showChatBox, setShowChatBox] = useState(false);
 
   const { assistants } = useContext(Context);
@@ -78,11 +77,6 @@ function Assistant({ endpoint }) {
     });
   }, [assistantId]);
 
-  const handleUserInput = (e) => {
-    e.preventDefault();
-    setUserInput(e.target.value);
-  };
-
   return (
     <>
       <Navigation />
@@ -96,9 +90,6 @@ function Assistant({ endpoint }) {
           {!!threads.length && showChatBox && (
             <Messager
               assistant={{ assistantId, name: assistant.name }}
-              handleUserInput={handleUserInput}
-              userInput={userInput}
-              setUserInput={setUserInput}
               messages={convertThreadToMessages(thread, assistantList)}
               endpoint={`http://localhost:3001${endpoint}/${selectedThread}`}
               setMessages={setThread}

@@ -5,7 +5,6 @@ import Messager from "../../components/Messager";
 
 function Chatbot({ endpoint }) {
   const [messages, setMessages] = useState("");
-  const [userInput, setUserInput] = useState("");
 
   console.log("endpoint", endpoint);
 
@@ -17,20 +16,10 @@ function Chatbot({ endpoint }) {
     });
   }, [endpoint]);
 
-  const handleUserInput = (e) => {
-    setUserInput(e.target.value);
-  };
-
-  console.log("messages", messages);
-  console.log("userInput", userInput);
-
   return (
     <>
       <Navigation />
       <Messager
-        handleUserInput={handleUserInput}
-        userInput={userInput}
-        setUserInput={setUserInput}
         messages={messages}
         endpoint={`http://localhost:3001${endpoint}`}
         setMessages={setMessages}

@@ -39,16 +39,8 @@ import "highlight.js/styles/felipec.css";
 
 // get the list of all highlight code blocks
 
-function Messager({
-  handleUserInput,
-  // sendMessageFn,
-  userInput,
-  setUserInput,
-  messages,
-  assistant,
-  endpoint,
-  setMessages,
-}) {
+function Messager({ messages, assistant, endpoint, setMessages }) {
+  const [userInput, setUserInput] = useState("");
   const [recorder, setRecorder] = useState(null);
   const [disableRecord, setDisableRecord] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
@@ -182,6 +174,10 @@ function Messager({
   //     console.error("Error uploading the image", error);
   //   }
   // };
+
+  const handleUserInput = (e) => {
+    setUserInput(e.target.value);
+  };
 
   const uploadFile = async () => {
     if (!selectedFile) {
