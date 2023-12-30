@@ -83,14 +83,6 @@ function Assistant({ endpoint }) {
     setUserInput(e.target.value);
   };
 
-  const sendMessageFn = (callback) =>
-    callback(
-      { message: userInput, assistantId },
-      setUserInput,
-      `http://localhost:3001${endpoint}/${selectedThread}`,
-      setThread
-    );
-
   return (
     <>
       <Navigation />
@@ -101,14 +93,15 @@ function Assistant({ endpoint }) {
             getMessages={getMessages}
             setThreads={setThreads}
           />
-          {threads.length && showChatBox && (
+          {!!threads.length && showChatBox && (
             <Messager
-              name={assistant.name}
+              assistant={{ assistantId, name: assistant.name }}
               handleUserInput={handleUserInput}
-              sendMessageFn={sendMessageFn}
               userInput={userInput}
               setUserInput={setUserInput}
               messages={convertThreadToMessages(thread, assistantList)}
+              endpoint={`http://localhost:3001${endpoint}/${selectedThread}`}
+              setMessages={setThread}
             />
           )}
         </div>

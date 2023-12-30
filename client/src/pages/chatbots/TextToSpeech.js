@@ -24,23 +24,16 @@ function Chatbot({ endpoint }) {
   console.log("messages", messages);
   console.log("userInput", userInput);
 
-  const sendMessageFn = (callback) =>
-    callback(
-      [...messages, { role: "user", content: userInput }],
-      setUserInput,
-      `http://localhost:3001${endpoint}`,
-      setMessages
-    );
-
   return (
     <>
       <Navigation />
       <Messager
         handleUserInput={handleUserInput}
-        sendMessageFn={sendMessageFn}
         userInput={userInput}
         setUserInput={setUserInput}
         messages={messages}
+        endpoint={`http://localhost:3001${endpoint}`}
+        setMessages={setMessages}
       />
     </>
   );

@@ -41,11 +41,13 @@ import "highlight.js/styles/felipec.css";
 
 function Messager({
   handleUserInput,
-  sendMessageFn,
+  // sendMessageFn,
   userInput,
   setUserInput,
   messages,
-  name,
+  assistant,
+  endpoint,
+  setMessages,
 }) {
   const [recorder, setRecorder] = useState(null);
   const [disableRecord, setDisableRecord] = useState(false);
@@ -55,6 +57,29 @@ function Messager({
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
+  const { name, assistantId } = assistant || {};
+
+  let payload;
+
+  if (assistant) {
+    payload = { message: userInput, assistantId };
+  } else {
+    payload = [
+      ...messages,
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: userInput,
+            ...(selectedFile?.name && {
+              metadata: `http://localhost:3001/imageFiles/${selectedFile?.name}`,
+            }),
+          },
+        ],
+      },
+    ];
+  }
   // const handleImageUpload = (event) => {
   //   setImageUrl(URL.createObjectURL(event.target.files[0]));
   // };
@@ -254,7 +279,14 @@ function Messager({
             onClick={async () => {
               await uploadFile();
               if (!userInput) return;
-              sendMessageFn(sendMessage, selectedFile?.name, isSoundOn); // TODO: is there a better way to do this? without passing in the selectedFile.name and isSoundOn?
+              sendMessage(
+                payload,
+                setUserInput,
+                endpoint,
+                setMessages,
+                isSoundOn
+              );
+
               setImageUrl(null);
               setSelectedFile(null);
             }}

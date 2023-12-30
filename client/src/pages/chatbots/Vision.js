@@ -28,46 +28,16 @@ function Chatbot({ endpoint }) {
   console.log("messages", messages);
   console.log("userInput", userInput);
 
-  const sendMessageFn = (callback, selectedFileName, isSoundOn) => {
-    console.log("========================>selectedFileName", selectedFileName);
-    callback(
-      [
-        ...messages,
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: userInput,
-              ...(selectedFileName && {
-                metadata: `http://localhost:3001/imageFiles/${selectedFileName}`,
-              }),
-            },
-            // {
-            //   type: "image_url",
-            //   image_url: {
-            //     url: imageUrl,
-            //   },
-            // },
-          ],
-        },
-      ],
-      setUserInput,
-      `http://localhost:3001${endpoint}`,
-      setMessages,
-      isSoundOn
-    );
-  };
-
   return (
     <>
       <Navigation />
       <Messager
         handleUserInput={handleUserInput}
-        sendMessageFn={sendMessageFn}
         userInput={userInput}
         setUserInput={setUserInput}
         messages={messages}
+        endpoint={`http://localhost:3001${endpoint}`}
+        setMessages={setMessages}
       />
     </>
   );
