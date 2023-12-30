@@ -39,7 +39,7 @@ import "highlight.js/styles/felipec.css";
 
 // get the list of all highlight code blocks
 
-function Messager({ messages, assistant, endpoint, setMessages }) {
+function Messager({ messages, metaData, setMessages }) {
   const [userInput, setUserInput] = useState("");
   const [recorder, setRecorder] = useState(null);
   const [disableRecord, setDisableRecord] = useState(false);
@@ -49,13 +49,16 @@ function Messager({ messages, assistant, endpoint, setMessages }) {
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
-  const { name, assistantId } = assistant || {};
+  let { type, name, assistantId, selectedThread } = metaData || {};
 
   let payload;
+  let endpoint = "";
 
-  if (assistant) {
+  if (type === "assistant") {
+    endpoint = `${type}/${selectedThread}`;
     payload = { message: userInput, assistantId };
   } else {
+    endpoint = type;
     payload = [
       ...messages,
       {
@@ -188,7 +191,7 @@ function Messager({ messages, assistant, endpoint, setMessages }) {
     formData.append("image", selectedFile);
 
     try {
-      const response = await fetch("http://localhost:3001/vision/message", {
+      const response = await fetch("http://localhost:3001/message/vision", {
         method: "POST",
         body: formData,
       });
@@ -215,7 +218,9 @@ function Messager({ messages, assistant, endpoint, setMessages }) {
 
   return (
     <div className="message-wrapper">
-      <h3 className="title">Assistant Name: {name}</h3>
+      {type === "assistant" && (
+        <h3 className="title">Assistant Name: {name}</h3>
+      )}
       <div className="chatBox">
         {!!messages?.length &&
           messages.map((message) => {
@@ -319,32 +324,34 @@ function Messager({ messages, assistant, endpoint, setMessages }) {
             {disableRecord ? <div className="recording" /> : <Microphone />}
           </div>
 
-          <div class="file-input">
-            <input
-              type="file"
-              id="file"
-              class="file"
-              onChange={handleFileInput}
-            />
-            <label for="file">
-              <UploadIcon role="button" />
-            </label>
-            {imageUrl && (
-              <div className="preview">
-                <img height="100" src={imageUrl} alt="preview"></img>
-                <div
-                  className="close"
-                  role="button"
-                  onClick={() => {
-                    setImageUrl(null);
-                    setSelectedFile(null);
-                  }}
-                >
-                  <img width="20" src={close} alt="close"></img>
+          {type === "vision" && (
+            <div class="file-input">
+              <input
+                type="file"
+                id="file"
+                class="file"
+                onChange={handleFileInput}
+              />
+              <label for="file">
+                <UploadIcon role="button" />
+              </label>
+              {imageUrl && (
+                <div className="preview">
+                  <img height="100" src={imageUrl} alt="preview"></img>
+                  <div
+                    className="close"
+                    role="button"
+                    onClick={() => {
+                      setImageUrl(null);
+                      setSelectedFile(null);
+                    }}
+                  >
+                    <img width="20" src={close} alt="close"></img>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

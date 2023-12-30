@@ -3,14 +3,18 @@ import axios from "axios";
 export const sendMessage = (
   payload,
   setUserInput,
-  apiEndpoint,
+  type,
+  // apiEndpoint,
   setMessages,
   isSoundOn
 ) => {
   axios
-    .post(apiEndpoint, {
+    .post(`http://localhost:3001/message/${type}`, {
       payload,
     })
+    // .post(apiEndpoint, {
+    //   payload,
+    // })
     .then((res) => res)
     .then(({ data }) => {
       console.log("post data ==>", data);

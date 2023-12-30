@@ -43,7 +43,8 @@ function Assistant({ endpoint }) {
     setSelectedThread(threadId);
     setShowChatBox(true);
     axios
-      .get(`http://localhost:3001${endpoint}/${threadId}`)
+      .get(`http://localhost:3001/message/assistant/${threadId}`)
+      // .get(`http://localhost:3001${endpoint}/${threadId}`)
       .then((res) => res)
       .then(({ data }) => {
         console.log("get data ==>", data);
@@ -89,9 +90,13 @@ function Assistant({ endpoint }) {
           />
           {!!threads.length && showChatBox && (
             <Messager
-              assistant={{ assistantId, name: assistant.name }}
+              metaData={{
+                type: "assistant",
+                assistantId,
+                name: assistant.name,
+                selectedThread,
+              }}
               messages={convertThreadToMessages(thread, assistantList)}
-              endpoint={`http://localhost:3001${endpoint}/${selectedThread}`}
               setMessages={setThread}
             />
           )}

@@ -55,45 +55,65 @@ app.post("/text-to-audio", async (req, res) => {
   streamAudioToClient(req, res, "speech/speech.mp3");
 });
 
-/************************************************** VISION ***************************************************************/
+/************************************************** MESSAGE ***************************************************************/
+app.get("/message/:type/:threadId?", async (req, res) => {
+  const { type, threadId = "id" } = req.params;
+  let messages;
+  let assistantList = [];
 
-app.get("/vision/message", async (req, res) => {
-  const messages = await vision();
-  res.json({ messages });
-});
-
-// app.post("/vision/message", async (req, res) => {
-//   const { payload } = req.body;
-//   const messages = await vision(payload);
-//   console.log("========messages", messages);
-//   res.json({ messages });
-// });
-
-app.post("/vision/message", uploadImage.single("image"), async (req, res) => {
-  console.log(
-    "===============================++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-  );
-  const { payload } = req.body;
-  const messages = await vision(payload);
-  console.log("========messages", messages);
-  if (req.file) {
-    convertBufferToImage(req, res);
+  if (type === "textToSpeech") {
+    messages = await textToSpeech();
   }
-  res.json({ messages });
+  if (type === "vision") {
+    messages = await vision();
+  }
+  if (type === "assistant" && threadId) {
+    messages = await getThread(threadId);
+    console.log("messages", messages);
+    assistantList = (await getAssistants()).map(({ id, name }) => ({
+      id,
+      name,
+    }));
+  }
+
+  res.json({ messages, assistantList });
 });
 
-/*****************************************************************************************************************/
-app.get("/text-to-speech/message", async (req, res) => {
-  const messages = await textToSpeech();
-  res.json({ messages });
-});
+app.post(
+  "/message/:type/:threadId?",
+  uploadImage.single("image"),
+  async (req, res) => {
+    const { type, threadId } = req.params;
+    const { payload } = req.body;
 
-app.post("/text-to-speech/message", async (req, res) => {
-  const { payload } = req.body;
-  const messages = await textToSpeech(payload);
-  console.log("========messages", messages);
-  res.json({ messages });
-});
+    let messages;
+
+    if (type === "textToSpeech") {
+      messages = await textToSpeech(payload);
+
+      console.log("========messages", messages);
+      res.json({ messages });
+    }
+
+    if (type === "vision") {
+      messages = await vision(payload);
+
+      if (req.file) {
+        convertBufferToImage(req, res);
+      }
+      res.json({ messages });
+    }
+
+    if (type === "assistant" && threadId) {
+      const data = await assistantChat(payload, threadId);
+      let { message, runId, assistantId, assistantList, messages } = data || {};
+      messages = messages.reverse();
+      res.json({ message, runId, assistantId, assistantList, messages });
+    }
+
+    console.log("========messages", messages);
+  }
+);
 
 /************************************************* USED BY MESSAGER COMPONENT ****************************************************************/
 app.get("/speech", (req, res) => {
@@ -112,25 +132,6 @@ app.get("/text-from-audio", async (req, res) => {
 });
 
 /*****************************************************************************************************************/
-app.get("/assistants/message/:threadId", async (req, res) => {
-  const { threadId } = req.params;
-  const messages = await getThread(threadId);
-  const assistantList = (await getAssistants()).map(({ id, name }) => ({
-    id,
-    name,
-  }));
-
-  res.json({ messages, assistantList });
-});
-/** Is this still needed? */
-app.post("/assistants/message/:threadId", async (req, res) => {
-  const { threadId } = req.params;
-  const { payload } = req.body;
-  const data = await assistantChat(payload, threadId);
-  let { message, runId, assistantId, assistantList, messages } = data || {};
-  messages = messages.reverse();
-  res.json({ message, runId, assistantId, assistantList, messages });
-});
 
 app.post("/create_chat/:assistantId", async (req, res) => {
   const { assistantId } = req.params;

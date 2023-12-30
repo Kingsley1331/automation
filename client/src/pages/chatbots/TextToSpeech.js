@@ -9,7 +9,7 @@ function Chatbot({ endpoint }) {
   console.log("endpoint", endpoint);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001${endpoint}`).then(({ data }) => {
+    axios.get("http://localhost:3001/message/textToSpeech").then(({ data }) => {
       console.log("get data ==>", data);
       // playAudio(); //visit: https://developer.chrome.com/blog/autoplay/
       return setMessages(data.messages);
@@ -20,8 +20,8 @@ function Chatbot({ endpoint }) {
     <>
       <Navigation />
       <Messager
+        metaData={{ type: "textToSpeech" }}
         messages={messages}
-        endpoint={`http://localhost:3001${endpoint}`}
         setMessages={setMessages}
       />
     </>
