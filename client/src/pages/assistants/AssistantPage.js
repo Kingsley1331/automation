@@ -88,7 +88,7 @@ function Assistant({ endpoint }) {
             getMessages={getMessages}
             setThreads={setThreads}
           />
-          {!!threads.length && showChatBox && (
+          {!!threads?.length && showChatBox && (
             <Messager
               metaData={{
                 type: "assistant",

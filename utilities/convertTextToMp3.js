@@ -13,7 +13,11 @@ async function convertTextToMp3(text) {
   );
   const mp3 = await openai.audio.speech.create({
     model: "tts-1",
-    voice: "alloy",
+    // voice: "onyx",
+    voice: "shimmer",
+    // voice: "nova",
+    // voice: "fable",
+    // voice: "alloy",
     input: text,
   });
   console.log(speechFile);
