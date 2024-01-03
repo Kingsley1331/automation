@@ -1,31 +1,25 @@
 import axios from "axios";
 
-export const sendMessage = (
+export const sendMessage = async (
   payload,
   setUserInput,
   type,
-  // apiEndpoint,
   setMessages,
   isSoundOn
 ) => {
-  axios
-    .post(`http://localhost:3001/message/${type}`, {
-      payload,
-    })
-    // .post(apiEndpoint, {
-    //   payload,
-    // })
-    .then((res) => res)
-    .then(({ data }) => {
-      console.log("post data ==>", data);
-      if (isSoundOn) {
-        playAudio();
-      }
-      setUserInput("");
-      if (data?.messages) {
-        return setMessages(data.messages);
-      }
-    });
+  const res = await axios.post(`http://localhost:3001/message/${type}`, {
+    payload,
+  });
+
+  const { data } = res;
+  console.log("post data ==>", data);
+  if (isSoundOn) {
+    playAudio();
+  }
+  setUserInput("");
+  if (data?.messages) {
+    setMessages(data.messages);
+  }
 };
 
 export const playAudio = async (callback) => {
@@ -91,7 +85,7 @@ export const stopRecording = (
   setDisableRecord(false);
 };
 
-export const sendAudio = (audioBlob, setUserInput) => {
+export const sendAudio = async (audioBlob, setUserInput) => {
   const formData = new FormData();
   formData.append("audio", audioBlob, "audioFileName.mp3");
   axios.post("http://localhost:3001/speech", formData).then((res) => {

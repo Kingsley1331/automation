@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
+import { Comment, Puff } from "react-loader-spinner";
 import {
   startRecording,
   stopRecording,
@@ -48,6 +49,9 @@ function Messager({ messages, metaData, setMessages }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [loadingResponse, setLoadingResponse] = useState(false);
+  const [loadingTextFromAudio, setLoadingTextFromAudio] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   let { type, name, assistantId, selectedThread } = metaData || {};
 
@@ -78,6 +82,7 @@ function Messager({ messages, metaData, setMessages }) {
   // const handleImageUpload = (event) => {
   //   setImageUrl(URL.createObjectURL(event.target.files[0]));
   // };
+  const responseSpinner = useRef(null);
 
   const copyToClipboard = (e) => {
     // e.preventDefault();
@@ -208,11 +213,15 @@ function Messager({ messages, metaData, setMessages }) {
   };
 
   useEffect(() => {
-    if (audioBlob) {
+    const handleAudioRecording = async () => {
       sendAudio(audioBlob, setUserInput);
-      getTextFromAudio(setUserInput);
+      await getTextFromAudio(setUserInput);
+      setLoadingTextFromAudio(false);
+    };
+    if (audioBlob) {
+      handleAudioRecording();
     }
-  }, [audioBlob, setUserInput]);
+  }, [audioBlob]);
 
   console.log("isAudioPlaying", isAudioPlaying);
 
@@ -265,6 +274,20 @@ function Messager({ messages, metaData, setMessages }) {
               </div>
             );
           })}
+        {loadingResponse && (
+          <div className="response-spinner" ref={responseSpinner}>
+            <Comment
+              visible={true}
+              height="160"
+              width="150"
+              ariaLabel="comment-loading"
+              wrapperStyle={{}}
+              wrapperClass="comment-wrapper"
+              color="#fff"
+              backgroundColor="#4fa94d"
+            />
+          </div>
+        )}
       </div>
       <div className="fixed">
         <div className="inputWrapper">
@@ -273,28 +296,49 @@ function Messager({ messages, metaData, setMessages }) {
             onChange={handleUserInput}
             value={userInput}
             placeholder="Ask me anything"
+            disabled={loadingResponse}
           />
+          {loadingTextFromAudio && (
+            <Puff
+              visible={true}
+              height="40"
+              width="40"
+              color="#4fa94d"
+              ariaLabel="puff-loading"
+              wrapperStyle={{ paddingRight: "15px" }}
+              wrapperClass=""
+            />
+          )}
           <div
             className={`send ${!userInput && "--inactive"}`}
             role="button"
             onClick={async () => {
-              await uploadFile();
-              if (!userInput) return;
-              sendMessage(
-                payload,
-                setUserInput,
-                endpoint,
-                setMessages,
-                isSoundOn
-              );
+              if (userInput && !loadingResponse) {
+                setLoadingResponse(true);
 
-              setImageUrl(null);
-              setSelectedFile(null);
+                setTimeout(() => {
+                  responseSpinner.current.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                });
+
+                await uploadFile();
+                await sendMessage(
+                  payload,
+                  setUserInput,
+                  endpoint,
+                  setMessages,
+                  isSoundOn
+                );
+                setLoadingResponse(false);
+                setImageUrl(null);
+                setSelectedFile(null);
+              }
             }}
           >
-            <SendIcon opacity={userInput ? 1 : 0.4} />
+            <SendIcon opacity={userInput && !loadingResponse ? 1 : 0.4} />
           </div>
-
           <div
             onClick={() => setIsSoundOn((state) => !state)}
             className="sound"
@@ -302,7 +346,6 @@ function Messager({ messages, metaData, setMessages }) {
           >
             {isSoundOn ? <SoundOnIcon /> : <SoundOffIcon />}
           </div>
-
           {/* <button onClick={playAudio}>Replay</button> */}
         </div>
 
@@ -317,6 +360,7 @@ function Messager({ messages, metaData, setMessages }) {
                 console.log("RECORDING");
                 startRecording(setAudioBlob, setDisableRecord, setRecorder);
               } else {
+                setLoadingTextFromAudio(true);
                 stopRecording(recorder, setDisableRecord);
               }
             }}
