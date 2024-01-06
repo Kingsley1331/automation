@@ -4,7 +4,7 @@ import "dotenv/config";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-async function speaker(payload) {
+async function textToSpeech(req, res, payload) {
   console.log("payload ==>", payload);
   let messages;
   if (!payload) {
@@ -14,20 +14,39 @@ async function speaker(payload) {
   if (payload) {
     messages = [...payload];
   }
+  /**TODO: refactor code below, remove duplication */
+  let completion;
+  let stream;
 
-  const completion = await openai.chat.completions.create({
-    messages,
-    // model: "gpt-3.5-turbo-1106",
-    model: "gpt-4-1106-preview",
-  });
+  if (!payload) {
+    completion = await openai.chat.completions.create({
+      messages,
+      model: "gpt-4-1106-preview",
+      // stream: true,
+    });
+  }
+  if (payload) {
+    stream = await openai.chat.completions.create({
+      messages,
+      model: "gpt-4-1106-preview",
+      stream: true,
+    });
 
-  const response = completion.choices[0]?.message?.content;
-  console.log(response);
-  console.log("choices", completion.choices);
-  const message = completion.choices[0]?.message?.content;
-  console.log("message", message);
-  await convertTextToMp3(message);
-  return [...messages, ...completion.choices.map((choice) => choice.message)];
+    let sumOfTextStream = "";
+
+    let textStream = "";
+
+    for await (const chunk of stream) {
+      textStream = chunk.choices[0]?.delta?.content || "";
+      sumOfTextStream += textStream;
+      res.write(textStream); // Stream the textStream to the client
+    }
+    res.end(); // End the response
+
+    await convertTextToMp3(sumOfTextStream);
+  } else {
+    return [...messages, ...completion.choices.map((choice) => choice.message)];
+  }
 }
 
-export default speaker;
+export default textToSpeech;

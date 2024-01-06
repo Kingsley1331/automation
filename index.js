@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import "dotenv/config";
-import fs from "fs";
 import main from "./chatbots/chat.js";
 import textToSpeech from "./chatbots/textToSpeech.js";
 import speechToText from "./chatbots/speechToText.js";
@@ -21,6 +20,7 @@ import convertBufferToImage, {
   convertBufferToBase64,
 } from "./utilities/convertBufferToImage.js";
 import convertTextToMp3 from "./utilities/convertTextToMp3.js";
+import { count } from "console";
 
 const upload = multer({ dest: "uploads/" });
 const storage = multer.memoryStorage();
@@ -50,8 +50,10 @@ app.post("/chatbots/chat/message", async (req, res) => {
 
 app.post("/text-to-audio", async (req, res) => {
   const { text } = req.body;
-  await convertTextToMp3(text);
-  // const messages = await main(userInput);
+  if (text) {
+    await convertTextToMp3(text);
+  }
+
   streamAudioToClient(req, res, "speech/speech.mp3");
 });
 
@@ -69,7 +71,6 @@ app.get("/message/:type/:threadId?", async (req, res) => {
   }
   if (type === "assistant" && threadId) {
     messages = await getThread(threadId);
-    console.log("messages", messages);
     assistantList = (await getAssistants()).map(({ id, name }) => ({
       id,
       name,
@@ -85,14 +86,16 @@ app.post(
   async (req, res) => {
     const { type, threadId } = req.params;
     const { payload } = req.body;
+    console.log("payload1", payload);
 
     let messages;
 
     if (type === "textToSpeech") {
-      messages = await textToSpeech(payload);
+      await textToSpeech(req, res, payload);
+      // messages = await textToSpeech(req, res, payload);
 
-      console.log("========messages", messages);
-      res.json({ messages });
+      // console.log("========messages", messages);
+      // res.json({ messages });
     }
 
     if (type === "vision") {
@@ -111,23 +114,30 @@ app.post(
       res.json({ message, runId, assistantId, assistantList, messages });
     }
 
-    console.log("========messages", messages);
+    // console.log("========messages", messages);
   }
 );
 
 /************************************************* USED BY MESSAGER COMPONENT ****************************************************************/
+
 app.get("/speech", (req, res) => {
-  streamAudioToClient(req, res, "speech/speech.mp3");
+  // console.log("=============================> GET AUDIO");
+  const timer = setInterval(() => {
+    if (global.convertTextToMp3) {
+      streamAudioToClient(req, res, "speech/speech.mp3");
+      clearInterval(timer);
+      global.convertTextToMp3 = false;
+    }
+  });
 });
 
 app.post("/speech", upload.single("audio"), async (req, res) => {
-  console.log("=============================>req.file", req.file);
   convertBlobToMp3(req, res);
 });
 
 app.get("/text-from-audio", async (req, res) => {
   const textFromAudio = await speechToText();
-  console.log("===================>textFromAudio", textFromAudio);
+  // console.log("===================>textFromAudio", textFromAudio);
   res.json({ textFromAudio });
 });
 

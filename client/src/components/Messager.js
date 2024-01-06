@@ -9,6 +9,7 @@ import {
   getTextFromAudio,
   playAudio,
   sendMessage,
+  sendMessage2,
   getAudioFromText,
 } from "../utilities/audio";
 import "./Messager.css";
@@ -51,7 +52,6 @@ function Messager({ messages, metaData, setMessages }) {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [loadingResponse, setLoadingResponse] = useState(false);
   const [loadingTextFromAudio, setLoadingTextFromAudio] = useState(false);
-  const [loadingMessages, setLoadingMessages] = useState(false);
 
   let { type, name, assistantId, selectedThread } = metaData || {};
 
@@ -64,7 +64,7 @@ function Messager({ messages, metaData, setMessages }) {
   } else {
     endpoint = type;
     payload = [
-      ...messages,
+      ...(messages?.length ? messages : []),
       {
         role: "user",
         content: [
@@ -83,6 +83,7 @@ function Messager({ messages, metaData, setMessages }) {
   //   setImageUrl(URL.createObjectURL(event.target.files[0]));
   // };
   const responseSpinner = useRef(null);
+  const chatBox = useRef(null);
 
   const copyToClipboard = (e) => {
     // e.preventDefault();
@@ -223,18 +224,20 @@ function Messager({ messages, metaData, setMessages }) {
     }
   }, [audioBlob]);
 
-  console.log("isAudioPlaying", isAudioPlaying);
+  const sendFunction =
+    metaData.type === "textToSpeech" ? sendMessage2 : sendMessage;
 
   return (
     <div className="message-wrapper">
       {type === "assistant" && (
         <h3 className="title">Assistant Name: {name}</h3>
       )}
-      <div className="chatBox">
+      <div className="chatBox" ref={chatBox}>
         {!!messages?.length &&
-          messages.map((message) => {
-            if (message.role === "system") return null;
-            const { content } = message;
+          messages.map((message = {}) => {
+            if (message?.role === "system") return null;
+            const { content } = message || { content: [] };
+            console.log("content", content);
             return (
               <div className="message-container">
                 <div className="message-wrapper">
@@ -250,7 +253,7 @@ function Messager({ messages, metaData, setMessages }) {
                     <img width="300" src={content[0]?.metadata} alt="vision" />
                   )}
                 </div>
-                {message.role === "assistant" && (
+                {message?.role === "assistant" && (
                   <div
                     onClick={async () => {
                       if (!isAudioPlaying) {
@@ -317,19 +320,21 @@ function Messager({ messages, metaData, setMessages }) {
                 setLoadingResponse(true);
 
                 setTimeout(() => {
-                  responseSpinner.current.scrollIntoView({
+                  responseSpinner.current?.scrollIntoView({
                     behavior: "smooth",
                     block: "start",
                   });
                 });
 
                 await uploadFile();
-                await sendMessage(
+                await sendFunction(
                   payload,
                   setUserInput,
                   endpoint,
                   setMessages,
-                  isSoundOn
+                  isSoundOn,
+                  setLoadingResponse,
+                  chatBox
                 );
                 setLoadingResponse(false);
                 setImageUrl(null);

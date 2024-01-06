@@ -7,10 +7,6 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const speechFile = path.resolve("./speech/speech.mp3");
 
 async function convertTextToMp3(text) {
-  console.log(
-    "========================================================= text",
-    text
-  );
   const mp3 = await openai.audio.speech.create({
     model: "tts-1",
     // voice: "onyx",
@@ -20,9 +16,13 @@ async function convertTextToMp3(text) {
     // voice: "alloy",
     input: text,
   });
-  console.log(speechFile);
+  // console.log(speechFile);
   const buffer = Buffer.from(await mp3.arrayBuffer());
   await fs.promises.writeFile(speechFile, buffer);
+  // console.log(
+  //   "========================================================= CONVERSION COMMPKETE"
+  // );
+  global.convertTextToMp3 = true;
 }
 
 export default convertTextToMp3;
