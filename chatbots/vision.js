@@ -12,14 +12,8 @@ async function vision(req, res, payload) {
     console.log("req.file", req.file);
     convertBufferToImage(req, res);
   }
-  console.log(
-    "=====================================================================VISION",
-    payload
-  );
+
   if (payload) {
-    console.log(
-      "=====================================================================payload"
-    );
     payload.forEach((message) => {
       if (message.role === "user" && message.content[0].metadata) {
         const filename = message.content[0].metadata.split("/").pop();
@@ -44,42 +38,24 @@ async function vision(req, res, payload) {
     messages = [...payload];
   }
 
-  /**TODO: refactor code below, remove duplication */
-  let completion;
-  let stream;
-
-  if (!payload) {
-    completion = await openai.chat.completions.create({
-      messages,
-      model: "gpt-4-vision-preview",
-      max_tokens: 600, // 4096 is the maximum possible
-    });
-  }
+  const responseText = await openai.chat.completions.create({
+    messages,
+    model: "gpt-4-vision-preview",
+    max_tokens: 600, // 4096 is the maximum possible
+    stream: !!payload,
+  });
 
   if (payload) {
-    stream = await openai.chat.completions.create({
-      messages,
-      model: "gpt-4-vision-preview",
-      max_tokens: 600, // 4096 is the maximum possible
-      stream: true,
-    });
-
     let sumOfTextStream = "";
-
     let textStream = "";
 
-    for await (const chunk of stream) {
+    for await (const chunk of responseText) {
       textStream = chunk.choices[0]?.delta?.content || "";
       sumOfTextStream += textStream;
       res.write(textStream); // Stream the textStream to the client
     }
     res.end(); // End the response
 
-    // const response = completion.choices[0]?.message?.content;
-    // console.log(response);
-    // console.log("choices", completion.choices);
-    // const message = completion.choices[0]?.message?.content;
-    // console.log("message", message);
     await convertTextToMp3(sumOfTextStream);
   } else {
     messages.map((msg) => {
@@ -88,11 +64,11 @@ async function vision(req, res, payload) {
       }
       return msg;
     });
-    // return [...messages, ...completion.choices.map((choice) => choice.message)];
-    res?.json({
+
+    res.json({
       messages: [
         ...messages,
-        ...completion.choices.map((choice) => choice.message),
+        ...responseText.choices.map((choice) => choice.message),
       ],
     });
   }

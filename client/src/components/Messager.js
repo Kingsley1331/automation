@@ -197,9 +197,6 @@ function Messager({ messages, metaData, setMessages }) {
     formData.append("image", selectedFile);
 
     try {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TRYING TO UPLOAD IMAGE"
-      );
       const response = await fetch("http://localhost:3001/message/vision", {
         method: "POST",
         body: formData,
@@ -341,7 +338,9 @@ function Messager({ messages, metaData, setMessages }) {
                   setLoadingResponse,
                   chatBox
                 );
-                setLoadingResponse(false);
+                if (type === "assistant") {
+                  setLoadingResponse(false);
+                }
                 setImageUrl(null);
                 setSelectedFile(null);
               }

@@ -16,11 +16,7 @@ import deleteThread from "./assistants/api/threads/deleteThread.js";
 import streamAudioToClient from "./utilities/streamAudioToClient.js";
 import convertBlobToMp3 from "./utilities/convertBlobToMp3.js";
 import vision from "./chatbots/vision.js";
-import convertBufferToImage, {
-  convertBufferToBase64,
-} from "./utilities/convertBufferToImage.js";
 import convertTextToMp3 from "./utilities/convertTextToMp3.js";
-import { count } from "console";
 
 const upload = multer({ dest: "uploads/" });
 const storage = multer.memoryStorage();
@@ -66,9 +62,11 @@ app.get("/message/:type/:threadId?", async (req, res) => {
   if (type === "textToSpeech") {
     messages = await textToSpeech(req, res);
   }
+
   if (type === "vision") {
     messages = await vision(req, res);
   }
+
   if (type === "assistant" && threadId) {
     messages = await getThread(threadId);
     assistantList = (await getAssistants()).map(({ id, name }) => ({
@@ -77,8 +75,6 @@ app.get("/message/:type/:threadId?", async (req, res) => {
     }));
     res.json({ messages, assistantList });
   }
-
-  // res.json({ messages, assistantList });
 });
 
 app.post(

@@ -14,29 +14,18 @@ async function textToSpeech(req, res, payload) {
   if (payload) {
     messages = [...payload];
   }
-  /**TODO: refactor code below, remove duplication */
-  let completion;
-  let stream;
 
-  if (!payload) {
-    completion = await openai.chat.completions.create({
-      messages,
-      model: "gpt-4-1106-preview",
-      // stream: true,
-    });
-  }
+  const responseText = await openai.chat.completions.create({
+    messages,
+    model: "gpt-4-1106-preview",
+    stream: !!payload,
+  });
+
   if (payload) {
-    stream = await openai.chat.completions.create({
-      messages,
-      model: "gpt-4-1106-preview",
-      stream: true,
-    });
-
     let sumOfTextStream = "";
-
     let textStream = "";
 
-    for await (const chunk of stream) {
+    for await (const chunk of responseText) {
       textStream = chunk.choices[0]?.delta?.content || "";
       sumOfTextStream += textStream;
       res.write(textStream); // Stream the textStream to the client
@@ -45,11 +34,10 @@ async function textToSpeech(req, res, payload) {
 
     await convertTextToMp3(sumOfTextStream);
   } else {
-    // return [...messages, ...completion.choices.map((choice) => choice.message)];
-    res?.json({
+    res.json({
       messages: [
         ...messages,
-        ...completion.choices.map((choice) => choice.message),
+        ...responseText.choices.map((choice) => choice.message),
       ],
     });
   }
