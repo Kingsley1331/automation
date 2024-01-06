@@ -31,7 +31,7 @@ export const sendMessage2 = (
   setLoadingResponse,
   chatBox
 ) => {
-  console.log("payload2", payload);
+  console.log("=====================>payload", payload);
   fetch(`http://localhost:3001/message/${type}`, {
     method: "POST",
     body: JSON.stringify({ payload }),

@@ -192,15 +192,20 @@ function Messager({ messages, metaData, setMessages }) {
     if (!selectedFile) {
       return;
     }
-
+    console.log("selectedFile", selectedFile);
     const formData = new FormData();
     formData.append("image", selectedFile);
 
     try {
+      console.log(
+        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TRYING TO UPLOAD IMAGE"
+      );
       const response = await fetch("http://localhost:3001/message/vision", {
         method: "POST",
         body: formData,
       });
+
+      console.log("response", response);
 
       if (response.ok) {
         setSelectedFile("");
@@ -225,7 +230,7 @@ function Messager({ messages, metaData, setMessages }) {
   }, [audioBlob]);
 
   const sendFunction =
-    metaData.type === "textToSpeech" ? sendMessage2 : sendMessage;
+    metaData.type === "assistant" ? sendMessage : sendMessage2;
 
   return (
     <div className="message-wrapper">
@@ -237,7 +242,7 @@ function Messager({ messages, metaData, setMessages }) {
           messages.map((message = {}) => {
             if (message?.role === "system") return null;
             const { content } = message || { content: [] };
-            console.log("content", content);
+
             return (
               <div className="message-container">
                 <div className="message-wrapper">
@@ -362,7 +367,6 @@ function Messager({ messages, metaData, setMessages }) {
             onClick={(e) => {
               e.preventDefault();
               if (!disableRecord) {
-                console.log("RECORDING");
                 startRecording(setAudioBlob, setDisableRecord, setRecorder);
               } else {
                 setLoadingTextFromAudio(true);

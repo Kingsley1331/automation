@@ -64,10 +64,10 @@ app.get("/message/:type/:threadId?", async (req, res) => {
   let assistantList = [];
 
   if (type === "textToSpeech") {
-    messages = await textToSpeech();
+    messages = await textToSpeech(req, res);
   }
   if (type === "vision") {
-    messages = await vision();
+    messages = await vision(req, res);
   }
   if (type === "assistant" && threadId) {
     messages = await getThread(threadId);
@@ -75,9 +75,10 @@ app.get("/message/:type/:threadId?", async (req, res) => {
       id,
       name,
     }));
+    res.json({ messages, assistantList });
   }
 
-  res.json({ messages, assistantList });
+  // res.json({ messages, assistantList });
 });
 
 app.post(
@@ -99,12 +100,15 @@ app.post(
     }
 
     if (type === "vision") {
-      messages = await vision(payload);
+      console.log("vison req.file", req.file);
+      await vision(req, res, payload);
 
-      if (req.file) {
-        convertBufferToImage(req, res);
-      }
-      res.json({ messages });
+      // if (req.file) {
+      //   console.log("req.file", req.file);
+      //   convertBufferToImage(req, res);
+      // }
+
+      // res.json({ messages });
     }
 
     if (type === "assistant" && threadId) {
@@ -121,7 +125,7 @@ app.post(
 /************************************************* USED BY MESSAGER COMPONENT ****************************************************************/
 
 app.get("/speech", (req, res) => {
-  // console.log("=============================> GET AUDIO");
+  console.log("=============================> GET AUDIO");
   const timer = setInterval(() => {
     if (global.convertTextToMp3) {
       streamAudioToClient(req, res, "speech/speech.mp3");

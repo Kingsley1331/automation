@@ -19,9 +19,9 @@ async function convertTextToMp3(text) {
   // console.log(speechFile);
   const buffer = Buffer.from(await mp3.arrayBuffer());
   await fs.promises.writeFile(speechFile, buffer);
-  // console.log(
-  //   "========================================================= CONVERSION COMMPKETE"
-  // );
+  console.log(
+    "========================================================= CONVERSION COMPLETE"
+  );
   global.convertTextToMp3 = true;
 }
 

@@ -45,7 +45,13 @@ async function textToSpeech(req, res, payload) {
 
     await convertTextToMp3(sumOfTextStream);
   } else {
-    return [...messages, ...completion.choices.map((choice) => choice.message)];
+    // return [...messages, ...completion.choices.map((choice) => choice.message)];
+    res?.json({
+      messages: [
+        ...messages,
+        ...completion.choices.map((choice) => choice.message),
+      ],
+    });
   }
 }
 

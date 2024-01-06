@@ -4,7 +4,10 @@ const convertBufferToImage = (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
-  console.log("====================================>req.file", req.file);
+  console.log(
+    "====================================> convertBufferToImage req.file",
+    req.file
+  );
 
   // Get the buffer from multer and the file extension
   const buffer = req.file.buffer;
@@ -36,6 +39,10 @@ export const convertBufferToBase64 = (req, res) => {
 };
 
 export const convertImageToBase64 = (filename) => {
+  console.log(
+    "====================================> convertImageToBase64 filename",
+    filename
+  );
   // Create a base64 string from an image => ztso+Mfuej2mPmLQxgD ...
   const base64 = fs.readFileSync(`uploads/imageFiles/${filename}`, "base64");
   return base64;
