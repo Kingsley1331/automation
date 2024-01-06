@@ -22,6 +22,68 @@ export const sendMessage = async (
   }
 };
 
+export const sendMessage2 = (
+  payload,
+  setUserInput,
+  type,
+  setMessages,
+  isSoundOn,
+  setLoadingResponse,
+  chatBox
+) => {
+  console.log("payload2", payload);
+  fetch(`http://localhost:3001/message/${type}`, {
+    method: "POST",
+    body: JSON.stringify({ payload }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      setUserInput("");
+      const reader = response.body.getReader();
+      return new ReadableStream({
+        async start(controller) {
+          let textChunk = "";
+          setLoadingResponse(false);
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
+            // Process chunk here
+            textChunk += new TextDecoder().decode(value);
+            console.count("textChunk");
+            setMessages([
+              ...payload,
+              {
+                role: "assistant",
+                content: [{ type: "text", text: textChunk }],
+              },
+            ]);
+            chatBox.current.scrollTop = chatBox.current.scrollHeight;
+            chatBox.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "end",
+            });
+          }
+
+          controller.close();
+          reader.releaseLock();
+        },
+      });
+    })
+    .then((stream) => new Response(stream))
+    .then((response) => response.text())
+    .then((text) => {
+      console.log("text", text);
+      if (isSoundOn) {
+        // getAudioFromText(text);
+        playAudio();
+      }
+    })
+    .catch((err) => console.error(err));
+};
+
 export const playAudio = async (callback) => {
   const { data } = await axios.get("http://localhost:3001/speech", {
     responseType: "arraybuffer",
@@ -42,7 +104,7 @@ export const playAudio = async (callback) => {
       callback();
     }
   };
-  //.addEventListener('playing',function() { myfunction(); },false)
+
   console.log("audio", audio);
 };
 
