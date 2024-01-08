@@ -1,26 +1,90 @@
 import axios from "axios";
 
-export const sendMessage = (
+export const sendMessage = async (
   payload,
   setUserInput,
-  apiEndpoint,
-  setMessages
+  type,
+  setMessages,
+  isSoundOn
 ) => {
-  // const payload = [...messages, { role: "user", content: userInput }];
-  axios
-    .post(apiEndpoint, {
-      payload,
-    })
-    .then((res) => res)
-    .then(({ data }) => {
-      console.log("post data ==>", data);
-      playAudio();
-      setUserInput("");
-      return setMessages(data.messages);
-    });
+  const res = await axios.post(`http://localhost:3001/message/${type}`, {
+    payload,
+  });
+
+  const { data } = res;
+  console.log("post data ==>", data);
+  if (isSoundOn) {
+    playAudio();
+  }
+  setUserInput("");
+  if (data?.messages) {
+    setMessages(data.messages);
+  }
 };
 
-export const playAudio = async () => {
+export const sendMessage2 = (
+  payload,
+  setUserInput,
+  type,
+  setMessages,
+  isSoundOn,
+  setLoadingResponse,
+  chatBox
+) => {
+  console.log("=====================>payload", payload);
+  fetch(`http://localhost:3001/message/${type}`, {
+    method: "POST",
+    body: JSON.stringify({ payload }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      setUserInput("");
+      const reader = response.body.getReader();
+      return new ReadableStream({
+        async start(controller) {
+          let textChunk = "";
+          setLoadingResponse(false);
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
+            // Process chunk here
+            textChunk += new TextDecoder().decode(value);
+            console.count("textChunk");
+            setMessages([
+              ...payload,
+              {
+                role: "assistant",
+                content: [{ type: "text", text: textChunk }],
+              },
+            ]);
+            chatBox.current.scrollTop = chatBox.current.scrollHeight;
+            chatBox.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "end",
+            });
+          }
+
+          controller.close();
+          reader.releaseLock();
+        },
+      });
+    })
+    .then((stream) => new Response(stream))
+    .then((response) => response.text())
+    .then((text) => {
+      console.log("text", text);
+      if (isSoundOn) {
+        // getAudioFromText(text);
+        playAudio();
+      }
+    })
+    .catch((err) => console.error(err));
+};
+
+export const playAudio = async (callback) => {
   const { data } = await axios.get("http://localhost:3001/speech", {
     responseType: "arraybuffer",
     headers: {
@@ -34,12 +98,27 @@ export const playAudio = async () => {
   const url = URL.createObjectURL(blob);
   const audio = new Audio(url);
   audio.play();
+  audio.onended = () => {
+    console.log("audio ended");
+    if (callback) {
+      callback();
+    }
+  };
+
+  console.log("audio", audio);
 };
 
 export const getTextFromAudio = async (setUserInput) => {
   const { data } = await axios.get("http://localhost:3001/text-from-audio");
   console.log("data", data);
   return data.textFromAudio;
+};
+
+export const getAudioFromText = async (text, callback) => {
+  await axios.post("http://localhost:3001/text-to-audio", {
+    text,
+  });
+  playAudio(callback);
 };
 
 export const startRecording = async (
@@ -68,7 +147,7 @@ export const stopRecording = (
   setDisableRecord(false);
 };
 
-export const sendAudio = (audioBlob, setUserInput) => {
+export const sendAudio = async (audioBlob, setUserInput) => {
   const formData = new FormData();
   formData.append("audio", audioBlob, "audioFileName.mp3");
   axios.post("http://localhost:3001/speech", formData).then((res) => {

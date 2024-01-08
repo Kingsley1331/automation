@@ -15,14 +15,19 @@ import createThread from "./assistants/api/threads/createThread.js";
 import deleteThread from "./assistants/api/threads/deleteThread.js";
 import streamAudioToClient from "./utilities/streamAudioToClient.js";
 import convertBlobToMp3 from "./utilities/convertBlobToMp3.js";
+import vision from "./chatbots/vision.js";
+import convertTextToMp3 from "./utilities/convertTextToMp3.js";
 
 const upload = multer({ dest: "uploads/" });
+const storage = multer.memoryStorage();
+const uploadImage = multer({ storage: storage });
 
 const app = express();
 const port = 3001;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static("uploads"));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -38,21 +43,92 @@ app.post("/chatbots/chat/message", async (req, res) => {
   const messages = await main(userInput);
   res.json({ messages });
 });
-/*****************************************************************************************************************/
-app.get("/text-to-speech/message", async (req, res) => {
-  const messages = await textToSpeech();
-  res.json({ messages });
+
+app.post("/text-to-audio", async (req, res) => {
+  const { text } = req.body;
+  if (text) {
+    await convertTextToMp3(text);
+  }
+
+  streamAudioToClient(req, res, "speech/speech.mp3");
 });
 
-app.post("/text-to-speech/message", async (req, res) => {
-  const { payload } = req.body;
-  const messages = await textToSpeech(payload);
-  console.log("========messages", messages);
-  res.json({ messages });
+/************************************************** MESSAGE ***************************************************************/
+app.get("/message/:type/:threadId?", async (req, res) => {
+  const { type, threadId = "id" } = req.params;
+  let messages;
+  let assistantList = [];
+
+  if (type === "textToSpeech") {
+    messages = await textToSpeech(req, res);
+  }
+
+  if (type === "vision") {
+    messages = await vision(req, res);
+  }
+
+  if (type === "assistant" && threadId) {
+    messages = await getThread(threadId);
+    assistantList = (await getAssistants()).map(({ id, name }) => ({
+      id,
+      name,
+    }));
+    res.json({ messages, assistantList });
+  }
 });
+
+app.post(
+  "/message/:type/:threadId?",
+  uploadImage.single("image"),
+  async (req, res) => {
+    const { type, threadId } = req.params;
+    const { payload } = req.body;
+    console.log("payload1", payload);
+
+    let messages;
+
+    if (type === "textToSpeech") {
+      await textToSpeech(req, res, payload);
+      // messages = await textToSpeech(req, res, payload);
+
+      // console.log("========messages", messages);
+      // res.json({ messages });
+    }
+
+    if (type === "vision") {
+      console.log("vison req.file", req.file);
+      await vision(req, res, payload);
+
+      // if (req.file) {
+      //   console.log("req.file", req.file);
+      //   convertBufferToImage(req, res);
+      // }
+
+      // res.json({ messages });
+    }
+
+    if (type === "assistant" && threadId) {
+      const data = await assistantChat(payload, threadId);
+      let { message, runId, assistantId, assistantList, messages } = data || {};
+      messages = messages.reverse();
+      res.json({ message, runId, assistantId, assistantList, messages });
+    }
+
+    // console.log("========messages", messages);
+  }
+);
+
+/************************************************* USED BY MESSAGER COMPONENT ****************************************************************/
 
 app.get("/speech", (req, res) => {
-  streamAudioToClient(req, res, "speech/speech.mp3");
+  console.log("=============================> GET AUDIO");
+  const timer = setInterval(() => {
+    if (global.convertTextToMp3) {
+      streamAudioToClient(req, res, "speech/speech.mp3");
+      clearInterval(timer);
+      global.convertTextToMp3 = false;
+    }
+  });
 });
 
 app.post("/speech", upload.single("audio"), async (req, res) => {
@@ -61,29 +137,11 @@ app.post("/speech", upload.single("audio"), async (req, res) => {
 
 app.get("/text-from-audio", async (req, res) => {
   const textFromAudio = await speechToText();
-  console.log("===================>textFromAudio", textFromAudio);
+  // console.log("===================>textFromAudio", textFromAudio);
   res.json({ textFromAudio });
 });
-/*****************************************************************************************************************/
-app.get("/assistants/message/:threadId", async (req, res) => {
-  const { threadId } = req.params;
-  const messages = await getThread(threadId);
-  const assistantList = (await getAssistants()).map(({ id, name }) => ({
-    id,
-    name,
-  }));
 
-  res.json({ messages, assistantList });
-});
-/** Is this still needed? */
-app.post("/assistants/message/:threadId", async (req, res) => {
-  const { threadId } = req.params;
-  const { payload } = req.body;
-  const data = await assistantChat(payload, threadId);
-  let { message, runId, assistantId, assistantList, messages } = data || {};
-  messages = messages.reverse();
-  res.json({ message, runId, assistantId, assistantList, messages });
-});
+/*****************************************************************************************************************/
 
 app.post("/create_chat/:assistantId", async (req, res) => {
   const { assistantId } = req.params;

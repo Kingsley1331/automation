@@ -4,15 +4,19 @@ import Navigation from "../../components/Navigation";
 import Messager from "../../components/Messager";
 
 function Chatbot({ endpoint }) {
-  const [messages, setMessages] = useState("");
+  const [messages, setMessages] = useState([
+    { role: "system", content: "You are a helpful assistant." },
+  ]);
 
   console.log("endpoint", endpoint);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/message/textToSpeech").then(({ data }) => {
+    axios.get("http://localhost:3001/message/vision").then(({ data }) => {
       console.log("get data ==>", data);
       // playAudio(); //visit: https://developer.chrome.com/blog/autoplay/
-      return setMessages(data.messages);
+      if (data?.messages) {
+        return setMessages(data.messages);
+      }
     });
   }, [endpoint]);
 
@@ -20,7 +24,7 @@ function Chatbot({ endpoint }) {
     <>
       <Navigation />
       <Messager
-        metaData={{ type: "textToSpeech" }}
+        metaData={{ type: "vision" }}
         messages={messages}
         setMessages={setMessages}
       />

@@ -13,7 +13,6 @@ function Assistant({ endpoint }) {
   const [thread, setThread] = useState([]);
   const [assistant, setAssistant] = useState("");
   const [assistantList, setAssistantList] = useState("");
-  const [userInput, setUserInput] = useState("");
   const [showChatBox, setShowChatBox] = useState(false);
 
   const { assistants } = useContext(Context);
@@ -44,7 +43,8 @@ function Assistant({ endpoint }) {
     setSelectedThread(threadId);
     setShowChatBox(true);
     axios
-      .get(`http://localhost:3001${endpoint}/${threadId}`)
+      .get(`http://localhost:3001/message/assistant/${threadId}`)
+      // .get(`http://localhost:3001${endpoint}/${threadId}`)
       .then((res) => res)
       .then(({ data }) => {
         console.log("get data ==>", data);
@@ -78,32 +78,26 @@ function Assistant({ endpoint }) {
     });
   }, [assistantId]);
 
-  const handleUserInput = (e) => {
-    setUserInput(e.target.value);
-  };
-
-  const sendMessageFn = (callback) =>
-    callback(
-      { message: userInput, assistantId },
-      setUserInput,
-      `http://localhost:3001${endpoint}/${selectedThread}`,
-      setThread
-    );
-
   return (
     <>
       <Navigation />
       <div className="messages-wrapper">
         <div className="messages-container">
-          <Threads threads={threads} getMessages={getMessages} />
-          {threads.length && showChatBox && (
+          <Threads
+            threads={threads}
+            getMessages={getMessages}
+            setThreads={setThreads}
+          />
+          {!!threads?.length && showChatBox && (
             <Messager
-              name={assistant.name}
-              handleUserInput={handleUserInput}
-              sendMessageFn={sendMessageFn}
-              userInput={userInput}
-              setUserInput={setUserInput}
+              metaData={{
+                type: "assistant",
+                assistantId,
+                name: assistant.name,
+                selectedThread,
+              }}
               messages={convertThreadToMessages(thread, assistantList)}
+              setMessages={setThread}
             />
           )}
         </div>
