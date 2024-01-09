@@ -12,14 +12,3 @@ export const getAssistant = async (assistant_Id) => {
 
   return assistant;
 };
-
-export const getOtherAssistants = async (assistant_Id) => {
-  await mongoose.connect(process.env.MONGODB_URI);
-  const assistantList = await assistants.find();
-
-  const assistants = assistantList.filter(
-    ({ assistantId }) => assistantId !== assistant_Id
-  );
-
-  return assistants;
-};

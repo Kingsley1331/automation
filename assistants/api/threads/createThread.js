@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import "dotenv/config";
 import assistants from "../../../models/assistants.js";
-import { getAssistant, getOtherAssistants } from "./utility.js";
+import { getAssistant } from "./utility.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
