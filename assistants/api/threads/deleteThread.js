@@ -1,12 +1,12 @@
 import OpenAI from "openai";
-import fs from "fs";
 import "dotenv/config";
-import { getAssistant, getOtherAssistants } from "./utility.js";
+import assistants from "../../../models/assistants.js";
+import { getAssistant } from "./utility.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const removeThreadFromAssistant = (assistant_Id, threadId) => {
-  const assistant = getAssistant(assistant_Id);
+const removeThreadFromAssistant = async (assistant_Id, threadId) => {
+  const assistant = await getAssistant(assistant_Id);
 
   if (!assistant) {
     return;
@@ -14,14 +14,10 @@ const removeThreadFromAssistant = (assistant_Id, threadId) => {
 
   assistant.threadIds = assistant.threadIds.filter((id) => id !== threadId);
 
-  const assistants = getOtherAssistants(assistant_Id);
-
-  if (!assistants) {
-    return;
-  }
-  assistants.push(assistant); // add the updated assistant to the array
-
-  fs.writeFileSync("database/assistants.json", JSON.stringify(assistants));
+  await assistants.updateOne(
+    { assistantId: assistant_Id },
+    { threadIds: assistant.threadIds }
+  );
 };
 
 const deleteThread = async (assistantId, threadId) => {
