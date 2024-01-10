@@ -1,22 +1,14 @@
-import fs from "fs";
+import mongoose from "mongoose";
 import "dotenv/config";
+import assistants from "../../../models/assistants.js";
 
-export const getAssistant = (assistant_Id) => {
-  const file = JSON.parse(fs.readFileSync("database/assistants.json", "utf8"));
+export const getAssistant = async (assistant_Id) => {
+  await mongoose.connect(process.env.MONGODB_URI);
+  const assistantList = await assistants.find();
 
-  const assistant = file.filter(
+  const assistant = assistantList.filter(
     ({ assistantId }) => assistantId === assistant_Id
   )[0];
 
   return assistant;
-};
-
-export const getOtherAssistants = (assistant_Id) => {
-  const file = JSON.parse(fs.readFileSync("database/assistants.json", "utf8"));
-
-  const assistants = file.filter(
-    ({ assistantId }) => assistantId !== assistant_Id
-  );
-
-  return assistants;
 };
